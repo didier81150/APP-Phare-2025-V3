@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Anti-Harcèlement Scolaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Page d'accueil -->
+        <div id="homePage" class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8 mb-8">
+                <div class="text-center mb-8">
+                    <div id="logoContainer" class="mb-6">
+                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h1 id="schoolTitle" class="text-xl font-bold text-gray-800 mb-4">Application Anti-Harcèlement Scolaire</h1>
+                    <p class="text-lg text-gray-600">Plateforme sécurisée de signalement et de gestion</p>
+                </div>
+
+                <!-- Informations légales -->
+                <div class="bg-red-50 border-l-4 border-red-400 p-6 mb-8">
+                    <h2 class="text-xl font-semibold text-red-800 mb-4">⚠️ Rappel à la loi et informations importantes</h2>
+                    <div class="text-red-700 space-y-2">
+                        <p><strong>Article 222-33-2-2 du Code pénal :</strong> Le harcèlement scolaire est un délit puni de 3 ans d'emprisonnement et 45 000€ d'amende.</p>
+                        <p><strong>Numéro d'urgence :</strong> 3020 (Numéro national "Non au harcèlement")</p>
+                        <p><strong>Cyberharcèlement :</strong> 3018 (Numéro national gratuit)</p>
+                        <p><strong>Urgence :</strong> 15 (SAMU) - 17 (Police) - 18 (Pompiers) - 112 (Urgences européennes)</p>
+                        <p class="text-sm mt-4">Cette application respecte le RGPD. Vos données sont protégées et utilisées uniquement dans le cadre de la lutte contre le harcèlement scolaire.</p>
+                    </div>
+                </div>
+
+                <!-- Boutons principaux -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <button onclick="showStudentLogin()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                            </svg>
+                            <div class="text-lg">Identification Élèves</div>
+                        </div>
+                    </button>
+
+                    <button onclick="showReferentLogin()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                            </svg>
+                            <div class="text-lg">Référent Phare</div>
+                        </div>
+                    </button>
+
+                    <button onclick="showAdminLogin()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-6 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="text-lg">Administrateur</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page de connexion élève -->
+        <div id="studentLoginPage" class="hidden max-w-md mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <button onclick="showHome()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Retour
+                </button>
+                
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion Élève</h2>
+                
+                <form id="studentLoginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Identifiant (fourni par le collège)</label>
+                        <input type="text" id="studentId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nom.prenom" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Classe</label>
+                        <select id="studentClass" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Sélectionner votre classe</option>
+                            <option value="6G1">6G1</option>
+                            <option value="6G2">6G2</option>
+                            <option value="6G3">6G3</option>
+                            <option value="6G4">6G4</option>
+                            <option value="6G5">6G5</option>
+                            <option value="6G6">6G6</option>
+                            <option value="6G7">6G7</option>
+                            <option value="6G8">6G8</option>
+                            <option value="6G9">6G9</option>
+                            <option value="5G1">5G1</option>
+                            <option value="5G2">5G2</option>
+                            <option value="5G3">5G3</option>
+                            <option value="5G4">5G4</option>
+                            <option value="5G5">5G5</option>
+                            <option value="5G6">5G6</option>
+                            <option value="5G7">5G7</option>
+                            <option value="5G8">5G8</option>
+                            <option value="5G9">5G9</option>
+                            <option value="4G1">4G1</option>
+                            <option value="4G2">4G2</option>
+                            <option value="4G3">4G3</option>
+                            <option value="4G4">4G4</option>
+                            <option value="4G5">4G5</option>
+                            <option value="4G6">4G6</option>
+                            <option value="4G7">4G7</option>
+                            <option value="4G8">4G8</option>
+                            <option value="4G9">4G9</option>
+                            <option value="3G1">3G1</option>
+                            <option value="3G2">3G2</option>
+                            <option value="3G3">3G3</option>
+                            <option value="3G4">3G4</option>
+                            <option value="3G5">3G5</option>
+                            <option value="3G6">3G6</option>
+                            <option value="3G7">3G7</option>
+                            <option value="3G8">3G8</option>
+                            <option value="3G9">3G9</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe provisoire</label>
+                        <input type="password" id="studentTempPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                        Se connecter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page de signalement élève -->
+        <div id="studentReportPage" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Signaler une situation</h2>
+                    <button onclick="studentLogout()" class="text-red-600 hover:text-red-800">Déconnexion</button>
+                </div>
+                
+                <form id="reportForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Vous êtes :</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="role" value="victime" class="mr-2" required>
+                                <span>Victime de harcèlement</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="role" value="temoin" class="mr-2" required>
+                                <span>Témoin de harcèlement</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lieu des faits</label>
+                        <select id="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Sélectionner le lieu</option>
+                            <option value="cour">Cour de récréation</option>
+                            <option value="classe">Salle de classe</option>
+                            <option value="couloir">Couloirs</option>
+                            <option value="cantine">Cantine</option>
+                            <option value="toilettes">Toilettes</option>
+                            <option value="transport">Transport scolaire</option>
+                            <option value="internet">Internet/Réseaux sociaux</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fréquence</label>
+                        <select id="frequency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Sélectionner la fréquence</option>
+                            <option value="quotidien">Tous les jours</option>
+                            <option value="hebdomadaire">Plusieurs fois par semaine</option>
+                            <option value="occasionnel">De temps en temps</option>
+                            <option value="unique">Une seule fois</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description de la situation</label>
+                        <textarea id="description" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Décrivez la situation de harcèlement..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
+                        Envoyer le signalement
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page de connexion référent -->
+        <div id="referentLoginPage" class="hidden max-w-md mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <button onclick="showHome()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Retour
+                </button>
+                
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion Référent Phare</h2>
+                
+                <form id="referentLoginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe référent</label>
+                        <input type="password" id="referentPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                        Se connecter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page tableau de bord référent -->
+        <div id="referentDashboard" class="hidden max-w-6xl mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Tableau de bord Référent Phare</h2>
+                    <button onclick="referentLogout()" class="text-red-600 hover:text-red-800">Déconnexion</button>
+                </div>
+
+                <!-- Export Configuration -->
+                <div class="mb-8 p-6 bg-blue-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">📥 Sauvegarde des données</h3>
+                    <div>
+                        <h4 class="text-md font-medium mb-2">Exporter la configuration</h4>
+                        <p class="text-sm text-gray-600 mb-3">Sauvegarde complète : élèves, signalements, paramètres</p>
+                        <button onclick="exportConfiguration()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                            📥 Télécharger sauvegarde
+                        </button>
+                    </div>
+                    
+                    <!-- Instructions GitHub -->
+                    <div class="mt-6 p-4 bg-white border-l-4 border-blue-400 rounded">
+                        <h4 class="font-semibold text-blue-800 mb-2">📚 Pour GitHub Pages :</h4>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <p><strong>1.</strong> Exportez votre configuration avant de publier</p>
+                            <p><strong>2.</strong> Chaque utilisateur aura la même configuration initiale</p>
+                            <p><strong>3.</strong> Les données restent locales à chaque appareil</p>
+                            <p><strong>4.</strong> Utilisez export/import pour synchroniser entre appareils</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion des emails -->
+                <div class="mb-8 p-6 bg-yellow-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">📧 Gestion des emails des référents</h3>
+                    <p class="text-sm text-gray-600 mb-3">Saisissez jusqu'à 3 adresses email qui recevront les signalements.</p>
+                    <div class="space-y-3">
+                        <input type="email" id="refEmail1" placeholder="adresse.email1@academie.fr" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <input type="email" id="refEmail2" placeholder="adresse.email2@academie.fr" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <input type="email" id="refEmail3" placeholder="adresse.email3@academie.fr" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <button onclick="saveReferentEmails()" class="mt-4 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md">
+                        Enregistrer les adresses
+                    </button>
+                </div>
+
+                <!-- Gestion liste élèves -->
+                <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">Gestion de la liste des élèves</h3>
+                    
+                    <!-- Import par copier-coller -->
+                    <div class="mb-6">
+                        <h4 class="text-md font-medium mb-2">Importation en lot (copier-coller depuis Excel)</h4>
+                        <p class="text-sm text-gray-600 mb-3">Copiez les colonnes depuis Excel dans l'ordre : Identifiant | Classe | Mot de passe provisoire</p>
+                        <textarea id="studentDataPaste" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Exemple :
+martin.jean	6A	temp123
+dupont.marie	6B	temp456
+bernard.paul	5A	temp789"></textarea>
+                        <div class="flex gap-4 mt-3">
+                            <button onclick="importFromPaste()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Importer les données</button>
+                            <button onclick="clearPasteArea()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">Effacer</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Ajout manuel d'élève -->
+                    <div class="border-t pt-6">
+                        <h4 class="text-md font-medium mb-3">Ajout manuel d'un élève</h4>
+                        <div class="grid md:grid-cols-4 gap-4">
+                            <input type="text" id="newStudentId" placeholder="nom.prenom" class="px-3 py-2 border border-gray-300 rounded-md">
+                            <select id="newStudentClass" class="px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">Classe</option>
+                                <option value="6G1">6G1</option>
+                                <option value="6G2">6G2</option>
+                                <option value="6G3">6G3</option>
+                                <option value="6G4">6G4</option>
+                                <option value="6G5">6G5</option>
+                                <option value="6G6">6G6</option>
+                                <option value="6G7">6G7</option>
+                                <option value="6G8">6G8</option>
+                                <option value="6G9">6G9</option>
+                                <option value="5G1">5G1</option>
+                                <option value="5G2">5G2</option>
+                                <option value="5G3">5G3</option>
+                                <option value="5G4">5G4</option>
+                                <option value="5G5">5G5</option>
+                                <option value="5G6">5G6</option>
+                                <option value="5G7">5G7</option>
+                                <option value="5G8">5G8</option>
+                                <option value="5G9">5G9</option>
+                                <option value="4G1">4G1</option>
+                                <option value="4G2">4G2</option>
+                                <option value="4G3">4G3</option>
+                                <option value="4G4">4G4</option>
+                                <option value="4G5">4G5</option>
+                                <option value="4G6">4G6</option>
+                                <option value="4G7">4G7</option>
+                                <option value="4G8">4G8</option>
+                                <option value="4G9">4G9</option>
+                                <option value="3G1">3G1</option>
+                                <option value="3G2">3G2</option>
+                                <option value="3G3">3G3</option>
+                                <option value="3G4">3G4</option>
+                                <option value="3G5">3G5</option>
+                                <option value="3G6">3G6</option>
+                                <option value="3G7">3G7</option>
+                                <option value="3G8">3G8</option>
+                                <option value="3G9">3G9</option>
+                            </select>
+                            <input type="text" id="newStudentTempPass" placeholder="Mot de passe provisoire" class="px-3 py-2 border border-gray-300 rounded-md">
+                            <button onclick="addStudent()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des élèves -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4">Liste des élèves inscrits</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Identifiant</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Classe</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Mot de passe provisoire</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Mot de passe généré</th>
+                                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Les élèves seront affichés ici -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Liste des signalements -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Signalements reçus</h3>
+                    <div id="reportsList" class="space-y-4">
+                        <!-- Les signalements seront affichés ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page de connexion administrateur -->
+        <div id="adminLoginPage" class="hidden max-w-md mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <button onclick="showHome()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                    </svg>
+                    Retour
+                </button>
+                
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion Administrateur</h2>
+                
+                <form id="adminLoginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe administrateur</label>
+                        <input type="password" id="adminPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                        Se connecter
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Page tableau de bord administrateur -->
+        <div id="adminDashboard" class="hidden max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg card-shadow p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Tableau de bord Administrateur</h2>
+                    <button onclick="adminLogout()" class="text-red-600 hover:text-red-800">Déconnexion</button>
+                </div>
+
+                <!-- Import Configuration -->
+                <div class="mb-8 p-6 bg-green-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">📤 Restauration des données</h3>
+                    <div>
+                        <h4 class="text-md font-medium mb-2">Importer une configuration</h4>
+                        <p class="text-sm text-gray-600 mb-3">Restaure une sauvegarde précédente</p>
+                        <input type="file" id="configFile" accept=".json" class="mb-3 text-sm w-full">
+                        <button onclick="importConfiguration()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            📤 Restaurer sauvegarde
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Upload logo -->
+                    <div class="p-6 bg-gray-50 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Logo de l'établissement</h3>
+                        <input type="file" id="logoFile" accept="image/*" class="mb-4">
+                        <button onclick="uploadLogo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                            Télécharger logo
+                        </button>
+                    </div>
+
+                    <!-- Changement nom établissement -->
+                    <div class="p-6 bg-gray-50 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Nom de l'établissement</h3>
+                        <input type="text" id="schoolNameInput" placeholder="Nom de l'établissement" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-4">
+                        <button onclick="changeSchoolName()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                            Modifier
+                        </button>
+                    </div>
+
+                    <!-- Changement mot de passe référent -->
+                    <div class="p-6 bg-gray-50 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Changer mot de passe référent</h3>
+                        <input type="password" id="newReferentPassword" placeholder="Nouveau mot de passe" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-4">
+                        <button onclick="changeReferentPassword()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+                            Modifier
+                        </button>
+                    </div>
+
+                    <!-- Réinitialisation -->
+                    <div class="p-6 bg-red-50 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-red-800">⚠️ Zone dangereuse</h3>
+                        <p class="text-sm text-red-600 mb-4">Supprime toutes les données de l'application</p>
+                        <button onclick="resetApplication()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+                            Réinitialiser l'application
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour afficher le mot de passe généré -->
+        <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-green-800 mb-2">🎉 Inscription réussie !</h3>
+                    <p class="text-gray-600">Première connexion - Mot de passe généré</p>
+                </div>
+
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+                    <h4 class="text-lg font-semibold text-blue-800 mb-3 text-center">🔐 VOTRE NOUVEAU MOT DE PASSE :</h4>
+                    <div class="bg-white border-2 border-blue-300 rounded-lg p-4 text-center">
+                        <span id="generatedPassword" class="text-2xl font-mono font-bold text-blue-900 select-all"></span>
+                    </div>
+                    <button onclick="copyPassword()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-300">
+                        📋 Copier le mot de passe
+                    </button>
+                </div>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <h4 class="font-semibold text-yellow-800 mb-2">📝 ACTIONS OBLIGATOIRES :</h4>
+                    <ul class="text-sm text-yellow-700 space-y-1">
+                        <li>1️⃣ Notez ce mot de passe sur papier</li>
+                        <li>2️⃣ Photographiez cet écran</li>
+                        <li>3️⃣ Copiez-le dans vos notes</li>
+                    </ul>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                    <h4 class="font-semibold text-red-800 mb-2">⚠️ TRÈS IMPORTANT :</h4>
+                    <ul class="text-sm text-red-700 space-y-1">
+                        <li>• L'ancien mot de passe ne fonctionne plus</li>
+                        <li>• Ne partagez JAMAIS ce mot de passe</li>
+                        <li>• Si perdu, contactez le référent Phare</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="closePasswordModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
+                        ✅ J'ai sauvegardé mon mot de passe
+                    </button>
+                    <button onclick="backToLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
+                        🔙 Retour à l'identification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // CONFIGURATION INITIALE - À MODIFIER AVANT DIFFUSION
+        // ========================================
+        const INITIAL_CONFIG = {
+            schoolName: "Collège [NOM DE VOTRE ÉTABLISSEMENT]", // Changez le nom ici
+            referentPassword: "Ph@re2025", // Changez ce mot de passe
+            schoolLogo: null, // Sera défini plus bas si vous avez un logo
+            initialStudents: [
+                // Exemple d'élèves pré-configurés (supprimez ou modifiez selon vos besoins)
+                // { id: "test.eleve", class: "6G1", tempPassword: "test123", password: null }
+                // { id: "dupont.marie", class: "6G2", tempPassword: "temp456", password: null }
+            ]
+        };
+
+        // Logo par défaut en base64 (remplacez par votre logo si nécessaire)
+        // Pour convertir votre logo : https://base64.guru/converter/encode/image
+        // Collez votre logo en base64 entre les guillemets ci-dessous :
+        const DEFAULT_LOGO_BASE64 = null; // "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+
+        // ========================================
+        // VARIABLES GLOBALES
+        // ========================================
+        let currentUser = null;
+        let studentsList = [];
+        let reportsList = [];
+        let referentPassword = INITIAL_CONFIG.referentPassword;
+        const adminPassword = '@dmiP@steur2025';
+
+        // ========================================
+        // INITIALISATION
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApplication();
+            setupEventListeners();
+        });
+
+        function initializeApplication() {
+            // Charger les données ou initialiser avec la configuration par défaut
+            loadData();
+            
+            // Appliquer la configuration initiale si c'est la première fois
+            if (!localStorage.getItem('appInitialized')) {
+                applyInitialConfiguration();
+                localStorage.setItem('appInitialized', 'true');
+            }
+            
+            // Mettre à jour l'affichage
+            updateDisplay();
+        }
+
+        function applyInitialConfiguration() {
+            // Appliquer le nom de l'établissement
+            if (INITIAL_CONFIG.schoolName && INITIAL_CONFIG.schoolName !== "Collège [NOM DE VOTRE ÉTABLISSEMENT]") {
+                localStorage.setItem('schoolName', INITIAL_CONFIG.schoolName);
+            }
+            
+            // Appliquer le logo par défaut
+            if (DEFAULT_LOGO_BASE64) {
+                localStorage.setItem('schoolLogo', DEFAULT_LOGO_BASE64);
+            }
+            
+            // Appliquer le mot de passe référent
+            if (INITIAL_CONFIG.referentPassword !== "Ph@re2025") {
+                referentPassword = INITIAL_CONFIG.referentPassword;
+                localStorage.setItem('referentPassword', referentPassword);
+            }
+            
+            // Ajouter les élèves initiaux
+            if (INITIAL_CONFIG.initialStudents && INITIAL_CONFIG.initialStudents.length > 0) {
+                studentsList = [...INITIAL_CONFIG.initialStudents];
+                localStorage.setItem('studentsList', JSON.stringify(studentsList));
+            }
+        }
+
+        function loadData() {
+            // Charger les données depuis localStorage
+            const savedStudents = localStorage.getItem('studentsList');
+            if (savedStudents) {
+                studentsList = JSON.parse(savedStudents);
+            }
+
+            const savedReports = localStorage.getItem('reportsList');
+            if (savedReports) {
+                reportsList = JSON.parse(savedReports);
+            }
+
+            const savedReferentPassword = localStorage.getItem('referentPassword');
+            if (savedReferentPassword) {
+                referentPassword = savedReferentPassword;
+            }
+        }
+
+        function updateDisplay() {
+            // Mettre à jour le nom de l'établissement
+            const savedSchoolName = localStorage.getItem('schoolName');
+            if (savedSchoolName) {
+                document.getElementById('schoolTitle').textContent = savedSchoolName;
+            }
+
+            // Mettre à jour le logo
+            const savedLogo = localStorage.getItem('schoolLogo');
+            if (savedLogo) {
+                document.getElementById('logoContainer').innerHTML = '<img src="' + savedLogo + '" alt="Logo établissement" class="w-24 h-24 mx-auto rounded-full object-cover">';
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('studentsList', JSON.stringify(studentsList));
+            localStorage.setItem('reportsList', JSON.stringify(reportsList));
+            localStorage.setItem('referentPassword', referentPassword);
+        }
+
+        // ========================================
+        // EXPORT/IMPORT CONFIGURATION
+        // ========================================
+        function exportConfiguration() {
+            try {
+                const config = {
+                    version: "1.0",
+                    exportDate: new Date().toISOString(),
+                    schoolName: localStorage.getItem('schoolName') || INITIAL_CONFIG.schoolName,
+                    schoolLogo: localStorage.getItem('schoolLogo'),
+                    referentPassword: referentPassword,
+                    adminPassword: adminPassword,
+                    studentsList: studentsList,
+                    reportsList: reportsList,
+                    appInitialized: localStorage.getItem('appInitialized')
+                };
+
+                const dataStr = JSON.stringify(config, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                const fileName = 'config_antiharcellement_' + new Date().toISOString().split('T')[0] + '.json';
+                link.download = fileName;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Nettoyer l'URL
+                setTimeout(() => {
+                    URL.revokeObjectURL(link.href);
+                }, 100);
+                
+                alert('✅ Configuration exportée avec succès !\n\n' +
+                      'Fichier téléchargé : ' + fileName + '\n\n' +
+                      'Contenu exporté :\n' +
+                      '• ' + studentsList.length + ' élève(s)\n' +
+                      '• ' + reportsList.length + ' signalement(s)\n' +
+                      '• Configuration complète');
+                      
+            } catch (error) {
+                console.error('Erreur export:', error);
+                alert('❌ Erreur lors de l\'exportation !\n\nVeuillez réessayer.');
+            }
+        }
+
+        function importConfiguration() {
+            const fileInput = document.getElementById('configFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('⚠️ Veuillez sélectionner un fichier de configuration (.json)');
+                return;
+            }
+
+            if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+                alert('❌ Format de fichier incorrect !\n\nVeuillez sélectionner un fichier .json');
+                return;
+            }
+
+            if (!confirm('⚠️ ATTENTION - IMPORTATION DESTRUCTIVE !\n\n' +
+                        'Cette action va REMPLACER DÉFINITIVEMENT :\n' +
+                        '• Tous les élèves actuels (' + studentsList.length + ')\n' +
+                        '• Tous les signalements (' + reportsList.length + ')\n' +
+                        '• Toute la configuration\n\n' +
+                        '💾 RECOMMANDATION : Exportez d\'abord vos données actuelles\n\n' +
+                        'Voulez-vous vraiment continuer ?')) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    
+                    // Validation stricte du fichier
+                    if (!config.version) {
+                        throw new Error('Fichier de configuration invalide : version manquante');
+                    }
+                    
+                    if (!Array.isArray(config.studentsList)) {
+                        throw new Error('Fichier de configuration invalide : liste d\'élèves corrompue');
+                    }
+                    
+                    if (!Array.isArray(config.reportsList)) {
+                        config.reportsList = []; // Créer une liste vide si manquante
+                    }
+
+                    // Sauvegarder les anciennes données pour rollback en cas d'erreur
+                    const oldData = {
+                        studentsList: [...studentsList],
+                        reportsList: [...reportsList],
+                        referentPassword: referentPassword,
+                        schoolName: localStorage.getItem('schoolName'),
+                        schoolLogo: localStorage.getItem('schoolLogo')
+                    };
+
+                    try {
+                        // Restaurer les données principales
+                        studentsList = config.studentsList;
+                        reportsList = config.reportsList;
+                        
+                        // Restaurer le mot de passe référent
+                        if (config.referentPassword) {
+                            referentPassword = config.referentPassword;
+                        }
+
+                        // Restaurer les paramètres localStorage
+                        if (config.schoolName) {
+                            localStorage.setItem('schoolName', config.schoolName);
+                        }
+                        
+                        if (config.schoolLogo) {
+                            localStorage.setItem('schoolLogo', config.schoolLogo);
+                        }
+                        
+                        if (config.appInitialized) {
+                            localStorage.setItem('appInitialized', config.appInitialized);
+                        }
+
+                        // Sauvegarder toutes les données
+                        saveData();
+                        
+                        // Mettre à jour l'affichage
+                        updateDisplay();
+                        displayStudents();
+                        displayReports();
+
+                        // Réinitialiser le champ de fichier
+                        fileInput.value = '';
+
+                        alert('✅ IMPORTATION RÉUSSIE !\n\n' +
+                              'Configuration restaurée :\n' +
+                              '• ' + studentsList.length + ' élève(s) importé(s)\n' +
+                              '• ' + reportsList.length + ' signalement(s) importé(s)\n' +
+                              '• Paramètres appliqués\n\n' +
+                              '📅 Date d\'export : ' + (config.exportDate ? new Date(config.exportDate).toLocaleDateString('fr-FR') : 'Inconnue'));
+
+                    } catch (saveError) {
+                        // Rollback en cas d'erreur de sauvegarde
+                        console.error('Erreur sauvegarde, rollback:', saveError);
+                        studentsList = oldData.studentsList;
+                        reportsList = oldData.reportsList;
+                        referentPassword = oldData.referentPassword;
+                        
+                        if (oldData.schoolName) {
+                            localStorage.setItem('schoolName', oldData.schoolName);
+                        }
+                        if (oldData.schoolLogo) {
+                            localStorage.setItem('schoolLogo', oldData.schoolLogo);
+                        }
+                        
+                        throw saveError;
+                    }
+
+                } catch (error) {
+                    console.error('Erreur import:', error);
+                    let errorMessage = '❌ ERREUR D\'IMPORTATION !\n\n';
+                    
+                    if (error.message.includes('JSON')) {
+                        errorMessage += 'Le fichier sélectionné n\'est pas un fichier JSON valide.';
+                    } else if (error.message.includes('version')) {
+                        errorMessage += 'Ce fichier ne semble pas être une sauvegarde de cette application.';
+                    } else if (error.message.includes('élèves')) {
+                        errorMessage += 'Les données d\'élèves dans ce fichier sont corrompues.';
+                    } else {
+                        errorMessage += 'Le fichier est corrompu ou incompatible.\n\n' +
+                                      'Détail : ' + error.message;
+                    }
+                    
+                    errorMessage += '\n\n💡 Vérifiez que vous utilisez un fichier exporté par cette application.';
+                    alert(errorMessage);
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('❌ Erreur de lecture du fichier !\n\nImpossible de lire le fichier sélectionné.');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function setupEventListeners() {
+            // Formulaire de connexion élève
+            document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleStudentLogin();
+            });
+
+            // Formulaire de signalement
+            document.getElementById('reportForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleReport();
+            });
+
+            // Formulaire de connexion référent
+            document.getElementById('referentLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleReferentLogin();
+            });
+
+            // Formulaire de connexion admin
+            document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleAdminLogin();
+            });
+        }
+
+        // Navigation
+        function showHome() {
+            hideAllPages();
+            document.getElementById('homePage').classList.remove('hidden');
+        }
+
+        function showStudentLogin() {
+            hideAllPages();
+            document.getElementById('studentLoginPage').classList.remove('hidden');
+        }
+
+        function showReferentLogin() {
+            hideAllPages();
+            document.getElementById('referentLoginPage').classList.remove('hidden');
+        }
+
+        function showAdminLogin() {
+            hideAllPages();
+            document.getElementById('adminLoginPage').classList.remove('hidden');
+        }
+
+        function hideAllPages() {
+            const pages = ['homePage', 'studentLoginPage', 'studentReportPage', 'referentLoginPage', 'referentDashboard', 'adminLoginPage', 'adminDashboard'];
+            pages.forEach(page => {
+                document.getElementById(page).classList.add('hidden');
+            });
+        }
+
+        // Gestion des connexions
+        function handleStudentLogin() {
+            const studentId = document.getElementById('studentId').value.trim().toLowerCase();
+            const studentClass = document.getElementById('studentClass').value;
+            const tempPassword = document.getElementById('studentTempPassword').value.trim();
+
+            console.log('Tentative de connexion:', { studentId, studentClass, tempPassword });
+            console.log('Liste des élèves:', studentsList);
+
+            // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
+            const student = studentsList.find(s => 
+                s.id.toLowerCase() === studentId && 
+                s.class === studentClass && 
+                s.tempPassword === tempPassword
+            );
+
+            console.log('Élève trouvé avec mot de passe provisoire:', student);
+
+            if (student && !student.password) {
+                // PREMIÈRE CONNEXION : Générer un nouveau mot de passe personnel
+                const newPassword = generatePassword();
+                student.password = newPassword;
+                
+                console.log('Nouveau mot de passe généré:', newPassword);
+                
+                // Sauvegarder immédiatement dans localStorage
+                saveData();
+                
+                // Sauvegarder le mot de passe sur l'appareil de l'élève pour faciliter les connexions futures
+                const studentKey = 'student_' + studentId + '_' + studentClass;
+                localStorage.setItem(studentKey, newPassword);
+                
+                // Afficher le mot de passe dans une popup personnalisée
+                showPasswordModal(newPassword);
+                
+                currentUser = student;
+                
+            } else {
+                // Vérifier si l'élève essaie de se connecter avec son mot de passe personnel (connexions suivantes)
+                const studentWithPassword = studentsList.find(s => 
+                    s.id.toLowerCase() === studentId && 
+                    s.class === studentClass && 
+                    s.password === tempPassword
+                );
+                
+                console.log('Élève trouvé avec mot de passe personnel:', studentWithPassword);
+                
+                if (studentWithPassword) {
+                    // Connexion réussie avec le mot de passe personnel
+                    currentUser = studentWithPassword;
+                    hideAllPages();
+                    document.getElementById('studentReportPage').classList.remove('hidden');
+                } else {
+                    // Identifiants incorrects
+                    console.log('Aucun élève trouvé avec ces identifiants');
+                    alert('❌ CONNEXION ÉCHOUÉE\n\n' +
+                          'Vérifiez attentivement :\n' +
+                          '• Votre identifiant (format: nom.prenom)\n' +
+                          '• Votre classe\n' +
+                          '• Votre mot de passe\n\n' +
+                          '🔑 RAPPEL :\n' +
+                          '• PREMIÈRE connexion : utilisez le mot de passe provisoire\n' +
+                          '• Connexions suivantes : utilisez votre mot de passe personnel\n\n' +
+                          '❓ Si vous avez oublié votre mot de passe personnel, contactez le référent Phare.');
+                }
+            }
+        }
+
+        function handleReferentLogin() {
+            const password = document.getElementById('referentPassword').value;
+            
+            if (password === referentPassword) {
+                hideAllPages();
+                document.getElementById('referentDashboard').classList.remove('hidden');
+                displayStudents();
+                displayReports();
+                loadReferentEmails();
+            } else {
+                alert('Mot de passe incorrect.');
+            }
+        }
+
+        function saveReferentEmails() {
+            const emails = [
+                document.getElementById('refEmail1').value.trim(),
+                document.getElementById('refEmail2').value.trim(),
+                document.getElementById('refEmail3').value.trim()
+            ];
+            
+            localStorage.setItem('referentEmails', JSON.stringify(emails));
+            alert('✅ Adresses email des référents enregistrées avec succès !');
+        }
+
+        function loadReferentEmails() {
+            const savedEmails = localStorage.getItem('referentEmails');
+            if (savedEmails) {
+                const emails = JSON.parse(savedEmails);
+                document.getElementById('refEmail1').value = emails[0] || '';
+                document.getElementById('refEmail2').value = emails[1] || '';
+                document.getElementById('refEmail3').value = emails[2] || '';
+            }
+        }
+
+        function handleAdminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === adminPassword) {
+                hideAllPages();
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                // Pré-remplir le nom de l'établissement
+                const savedSchoolName = localStorage.getItem('schoolName');
+                if (savedSchoolName) {
+                    document.getElementById('schoolNameInput').value = savedSchoolName;
+                }
+            } else {
+                alert('Mot de passe incorrect.');
+            }
+        }
+
+        // Gestion des signalements
+        function handleReport() {
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const location = document.getElementById('location').value;
+            const frequency = document.getElementById('frequency').value;
+            const description = document.getElementById('description').value;
+
+            const report = {
+                id: Date.now(),
+                studentId: currentUser.id,
+                studentClass: currentUser.class,
+                role: role,
+                location: location,
+                frequency: frequency,
+                description: description,
+                date: new Date().toLocaleDateString('fr-FR'),
+                seen: false,
+                treated: false
+            };
+
+            reportsList.push(report);
+            saveData();
+
+            // Préparer et envoyer l'email
+            const savedEmails = localStorage.getItem('referentEmails');
+            if (savedEmails) {
+                const emails = JSON.parse(savedEmails).filter(e => e); // Filtrer les emails vides
+                if (emails.length > 0) {
+                    const to = emails.join(',');
+                    const subject = "Signalement Phare";
+                    
+                    const body = `
+Nouveau signalement reçu :
+
+-----------------------------------
+INFORMATIONS SUR LE SIGNALEMENT
+-----------------------------------
+- Signalé par : ${report.studentId}
+- Classe : ${report.studentClass}
+- Rôle déclaré : ${report.role}
+- Date : ${report.date}
+- Lieu des faits : ${report.location}
+- Fréquence : ${report.frequency}
+
+-----------------------------------
+DESCRIPTION DE LA SITUATION
+-----------------------------------
+${report.description}
+
+-----------------------------------
+Ceci est un message automatique généré par l'application Anti-Harcèlement.
+                    `.trim();
+
+                    const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.location.href = mailtoLink;
+                }
+            }
+
+            alert('Signalement sauvegardé ! Votre application d\'email va s\'ouvrir pour que vous puissiez l\'envoyer aux référents. N\'oubliez pas d\'appuyer sur \'Envoyer\' dans votre application d\'email.');
+            document.getElementById('reportForm').reset();
+        }
+
+        // Gestion référent
+        function importFromPaste() {
+            const pasteData = document.getElementById('studentDataPaste').value.trim();
+            
+            if (!pasteData) {
+                alert('⚠️ Veuillez coller les données des élèves dans la zone de texte.');
+                return;
+            }
+
+            try {
+                const lines = pasteData.split('\n');
+                const importedStudents = [];
+                const duplicateStudents = [];
+                const errorLines = [];
+
+                lines.forEach((line, index) => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        // Séparer par tabulation ou espaces multiples
+                        const parts = trimmedLine.split(/\t+|\s{2,}/).map(part => part.trim());
+                        
+                        if (parts.length >= 3 && parts[0] && parts[1] && parts[2]) {
+                            // Validation de l'identifiant (format nom.prenom)
+                            if (!parts[0].includes('.') || parts[0].split('.').length !== 2) {
+                                errorLines.push({
+                                    line: index + 1,
+                                    error: 'Format identifiant incorrect (attendu: nom.prenom)',
+                                    data: parts[0]
+                                });
+                                return;
+                            }
+
+                            // Validation de la classe
+                            const validClasses = ['6G1','6G2','6G3','6G4','6G5','6G6','6G7','6G8','6G9',
+                                                '5G1','5G2','5G3','5G4','5G5','5G6','5G7','5G8','5G9',
+                                                '4G1','4G2','4G3','4G4','4G5','4G6','4G7','4G8','4G9',
+                                                '3G1','3G2','3G3','3G4','3G5','3G6','3G7','3G8','3G9'];
+                            
+                            if (!validClasses.includes(parts[1])) {
+                                errorLines.push({
+                                    line: index + 1,
+                                    error: 'Classe non reconnue',
+                                    data: parts[1]
+                                });
+                                return;
+                            }
+
+                            // Validation du mot de passe (minimum 4 caractères)
+                            if (parts[2].length < 4) {
+                                errorLines.push({
+                                    line: index + 1,
+                                    error: 'Mot de passe trop court (minimum 4 caractères)',
+                                    data: parts[2]
+                                });
+                                return;
+                            }
+
+                            // Vérifier si l'élève existe déjà
+                            const existingStudent = studentsList.find(s => s.id === parts[0] && s.class === parts[1]);
+                            if (existingStudent) {
+                                duplicateStudents.push({
+                                    id: parts[0],
+                                    class: parts[1]
+                                });
+                                return;
+                            }
+
+                            // Ajouter l'élève valide
+                            importedStudents.push({
+                                id: parts[0],
+                                class: parts[1],
+                                tempPassword: parts[2],
+                                password: null
+                            });
+                        } else {
+                            errorLines.push({
+                                line: index + 1,
+                                error: 'Format incorrect (3 colonnes requises)',
+                                data: trimmedLine
+                            });
+                        }
+                    }
+                });
+
+                // Afficher les erreurs détaillées
+                if (errorLines.length > 0) {
+                    let errorMessage = '⚠️ ERREURS DÉTECTÉES :\n\n';
+                    errorLines.slice(0, 5).forEach(error => {
+                        errorMessage += `Ligne ${error.line}: ${error.error}\n`;
+                        errorMessage += `Données: "${error.data}"\n\n`;
+                    });
+                    
+                    if (errorLines.length > 5) {
+                        errorMessage += `... et ${errorLines.length - 5} autres erreurs\n\n`;
+                    }
+                    
+                    errorMessage += '📋 FORMAT ATTENDU :\n';
+                    errorMessage += 'nom.prenom [TAB] classe [TAB] motdepasse\n\n';
+                    errorMessage += 'Exemple :\n';
+                    errorMessage += 'martin.jean	6G1	temp123';
+                    
+                    alert(errorMessage);
+                }
+
+                // Afficher les doublons
+                if (duplicateStudents.length > 0) {
+                    let duplicateMessage = '🔄 ÉLÈVES DÉJÀ PRÉSENTS :\n\n';
+                    duplicateStudents.slice(0, 10).forEach(dup => {
+                        duplicateMessage += `• ${dup.id} (${dup.class})\n`;
+                    });
+                    
+                    if (duplicateStudents.length > 10) {
+                        duplicateMessage += `... et ${duplicateStudents.length - 10} autres`;
+                    }
+                    
+                    alert(duplicateMessage);
+                }
+
+                if (importedStudents.length === 0) {
+                    alert('❌ AUCUN ÉLÈVE IMPORTÉ !\n\n' +
+                          'Causes possibles :\n' +
+                          '• Format des données incorrect\n' +
+                          '• Tous les élèves sont déjà présents\n' +
+                          '• Erreurs de validation\n\n' +
+                          'Vérifiez le format et corrigez les erreurs.');
+                    return;
+                }
+
+                // Ajouter les nouveaux élèves à la liste existante
+                studentsList.push(...importedStudents);
+                saveData();
+                displayStudents();
+                
+                // Vider la zone de texte
+                document.getElementById('studentDataPaste').value = '';
+                
+                let successMessage = `✅ IMPORTATION RÉUSSIE !\n\n`;
+                successMessage += `• ${importedStudents.length} élève(s) importé(s)\n`;
+                
+                if (duplicateStudents.length > 0) {
+                    successMessage += `• ${duplicateStudents.length} doublon(s) ignoré(s)\n`;
+                }
+                
+                if (errorLines.length > 0) {
+                    successMessage += `• ${errorLines.length} erreur(s) corrigée(s)\n`;
+                }
+                
+                alert(successMessage);
+                
+            } catch (error) {
+                console.error('Erreur importation:', error);
+                alert('❌ ERREUR TECHNIQUE !\n\n' +
+                      'Une erreur inattendue s\'est produite lors de l\'importation.\n\n' +
+                      'Vérifiez le format des données et réessayez.\n\n' +
+                      'Détail : ' + error.message);
+            }
+        }
+
+        function clearPasteArea() {
+            document.getElementById('studentDataPaste').value = '';
+        }
+
+        function addStudent() {
+            const id = document.getElementById('newStudentId').value.trim();
+            const studentClass = document.getElementById('newStudentClass').value;
+            const tempPassword = document.getElementById('newStudentTempPass').value.trim();
+
+            // Validation des champs obligatoires
+            if (!id || !studentClass || !tempPassword) {
+                alert('⚠️ CHAMPS OBLIGATOIRES !\n\n' +
+                      'Veuillez remplir tous les champs :\n' +
+                      '• Identifiant (format: nom.prenom)\n' +
+                      '• Classe\n' +
+                      '• Mot de passe provisoire');
+                return;
+            }
+
+            // Validation de l'identifiant (format nom.prenom)
+            if (!id.includes('.') || id.split('.').length !== 2) {
+                alert('❌ FORMAT IDENTIFIANT INCORRECT !\n\n' +
+                      'L\'identifiant doit être au format : nom.prenom\n\n' +
+                      'Exemples valides :\n' +
+                      '• martin.jean\n' +
+                      '• dupont.marie\n' +
+                      '• bernard.paul');
+                return;
+            }
+
+            // Validation du mot de passe (minimum 4 caractères)
+            if (tempPassword.length < 4) {
+                alert('❌ MOT DE PASSE TROP COURT !\n\n' +
+                      'Le mot de passe provisoire doit contenir au minimum 4 caractères.\n\n' +
+                      'Mot de passe actuel : ' + tempPassword.length + ' caractère(s)');
+                return;
+            }
+
+            // Vérifier si l'élève existe déjà
+            const existingStudent = studentsList.find(s => s.id === id && s.class === studentClass);
+            if (existingStudent) {
+                alert('🔄 ÉLÈVE DÉJÀ PRÉSENT !\n\n' +
+                      'Cet élève existe déjà dans cette classe :\n' +
+                      '• Identifiant : ' + id + '\n' +
+                      '• Classe : ' + studentClass + '\n\n' +
+                      'Vérifiez les informations ou modifiez l\'identifiant.');
+                return;
+            }
+
+            try {
+                const newStudent = {
+                    id: id.toLowerCase(), // Normaliser en minuscules
+                    class: studentClass,
+                    tempPassword: tempPassword,
+                    password: null
+                };
+
+                studentsList.push(newStudent);
+                saveData();
+
+                // Réinitialiser les champs
+                document.getElementById('newStudentId').value = '';
+                document.getElementById('newStudentClass').value = '';
+                document.getElementById('newStudentTempPass').value = '';
+
+                // Actualiser l'affichage
+                displayStudents();
+                
+                alert('✅ ÉLÈVE AJOUTÉ AVEC SUCCÈS !\n\n' +
+                      '• Identifiant : ' + newStudent.id + '\n' +
+                      '• Classe : ' + newStudent.class + '\n' +
+                      '• Mot de passe provisoire : ' + newStudent.tempPassword + '\n\n' +
+                      'L\'élève peut maintenant se connecter avec ces informations.');
+                      
+            } catch (error) {
+                console.error('Erreur ajout élève:', error);
+                alert('❌ ERREUR TECHNIQUE !\n\n' +
+                      'Impossible d\'ajouter l\'élève.\n' +
+                      'Veuillez réessayer.\n\n' +
+                      'Détail : ' + error.message);
+            }
+        }
+
+        function displayStudents() {
+            const studentsTableBody = document.getElementById('studentsTableBody');
+            
+            if (studentsList.length === 0) {
+                studentsTableBody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Aucun élève inscrit</td></tr>';
+                return;
+            }
+
+            let tableHTML = '';
+            studentsList.forEach(student => {
+                const statusClass = student.password ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                const statusText = student.password ? 'Inscrit' : 'En attente';
+                const passwordDisplay = student.password ? student.password : '-';
+                
+                tableHTML += '<tr class="border-b border-gray-200 hover:bg-gray-50">';
+                tableHTML += '<td class="px-4 py-3 text-sm">' + student.id + '</td>';
+                tableHTML += '<td class="px-4 py-3 text-sm">' + student.class + '</td>';
+                tableHTML += '<td class="px-4 py-3 text-sm font-mono">' + student.tempPassword + '</td>';
+                tableHTML += '<td class="px-4 py-3 text-sm font-mono">' + passwordDisplay + '</td>';
+                tableHTML += '<td class="px-4 py-3 text-sm">';
+                tableHTML += '<span class="px-2 py-1 rounded-full text-xs ' + statusClass + '">';
+                tableHTML += statusText;
+                tableHTML += '</span>';
+                tableHTML += '</td>';
+                tableHTML += '</tr>';
+            });
+            
+            studentsTableBody.innerHTML = tableHTML;
+        }
+
+        function displayReports() {
+            const reportsList_div = document.getElementById('reportsList');
+            
+            if (reportsList.length === 0) {
+                reportsList_div.innerHTML = '<p class="text-gray-500 text-center py-8">Aucun signalement reçu.</p>';
+                return;
+            }
+
+            let reportsHTML = '';
+            reportsList.forEach(report => {
+                const bgClass = report.seen ? 'bg-gray-50' : 'bg-yellow-50';
+                const roleText = report.role === 'victime' ? 'Victime' : 'Témoin';
+                const seenChecked = report.seen ? 'checked' : '';
+                const treatedChecked = report.treated ? 'checked' : '';
+                
+                reportsHTML += '<div class="border border-gray-200 rounded-lg p-6 ' + bgClass + '">';
+                reportsHTML += '<div class="flex justify-between items-start mb-4">';
+                reportsHTML += '<div>';
+                reportsHTML += '<h4 class="font-semibold text-lg">Signalement #' + report.id + '</h4>';
+                reportsHTML += '<p class="text-sm text-gray-600">Élève: ' + report.studentId + ' (' + report.studentClass + ') - ' + report.date + '</p>';
+                reportsHTML += '</div>';
+                reportsHTML += '<div class="flex gap-2">';
+                reportsHTML += '<label class="flex items-center">';
+                reportsHTML += '<input type="checkbox" ' + seenChecked + ' onchange="toggleSeen(' + report.id + ')" class="mr-2">';
+                reportsHTML += '<span class="text-sm">Vu</span>';
+                reportsHTML += '</label>';
+                reportsHTML += '<label class="flex items-center">';
+                reportsHTML += '<input type="checkbox" ' + treatedChecked + ' onchange="toggleTreated(' + report.id + ')" class="mr-2">';
+                reportsHTML += '<span class="text-sm">Traité</span>';
+                reportsHTML += '</label>';
+                reportsHTML += '</div>';
+                reportsHTML += '</div>';
+                reportsHTML += '<div class="grid md:grid-cols-3 gap-4 mb-4">';
+                reportsHTML += '<p><strong>Rôle:</strong> ' + roleText + '</p>';
+                reportsHTML += '<p><strong>Lieu:</strong> ' + report.location + '</p>';
+                reportsHTML += '<p><strong>Fréquence:</strong> ' + report.frequency + '</p>';
+                reportsHTML += '</div>';
+                reportsHTML += '<div>';
+                reportsHTML += '<p><strong>Description:</strong></p>';
+                reportsHTML += '<p class="mt-2 p-3 bg-white rounded border">' + report.description + '</p>';
+                reportsHTML += '</div>';
+                reportsHTML += '</div>';
+            });
+            
+            reportsList_div.innerHTML = reportsHTML;
+        }
+
+        function toggleSeen(reportId) {
+            const report = reportsList.find(r => r.id === reportId);
+            if (report) {
+                report.seen = !report.seen;
+                saveData();
+            }
+        }
+
+        function toggleTreated(reportId) {
+            const report = reportsList.find(r => r.id === reportId);
+            if (report) {
+                report.treated = !report.treated;
+                saveData();
+            }
+        }
+
+        // Gestion administrateur
+        function uploadLogo() {
+            const fileInput = document.getElementById('logoFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Veuillez sélectionner un fichier image.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const logoData = e.target.result;
+                localStorage.setItem('schoolLogo', logoData);
+                document.getElementById('logoContainer').innerHTML = '<img src="' + logoData + '" alt="Logo établissement" class="w-24 h-24 mx-auto rounded-full object-cover">';
+                alert('Logo téléchargé avec succès.');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function changeSchoolName() {
+            const newName = document.getElementById('schoolNameInput').value.trim();
+            
+            if (!newName) {
+                alert('Veuillez saisir un nom d\'établissement.');
+                return;
+            }
+
+            localStorage.setItem('schoolName', newName);
+            document.getElementById('schoolTitle').textContent = newName;
+            alert('Nom de l\'établissement modifié avec succès.');
+        }
+
+        function changeReferentPassword() {
+            const newPassword = document.getElementById('newReferentPassword').value;
+            
+            if (!newPassword) {
+                alert('Veuillez saisir un nouveau mot de passe.');
+                return;
+            }
+
+            referentPassword = newPassword;
+            saveData();
+            document.getElementById('newReferentPassword').value = '';
+            alert('Mot de passe référent modifié avec succès.');
+        }
+
+        function resetApplication() {
+            if (!confirm('⚠️ RÉINITIALISATION COMPLÈTE !\n\n' +
+                        'Cette action va SUPPRIMER DÉFINITIVEMENT :\n' +
+                        '• Tous les élèves (' + studentsList.length + ')\n' +
+                        '• Tous les signalements (' + reportsList.length + ')\n' +
+                        '• Toute la configuration personnalisée\n' +
+                        '• Le logo et le nom de l\'établissement\n\n' +
+                        '💾 RECOMMANDATION : Exportez vos données avant de continuer\n\n' +
+                        'Voulez-vous vraiment réinitialiser ?')) {
+                return;
+            }
+
+            if (!confirm('⚠️ DERNIÈRE CONFIRMATION !\n\n' +
+                        'Cette action est IRRÉVERSIBLE.\n\n' +
+                        'Toutes vos données seront perdues à jamais.\n\n' +
+                        'Confirmez-vous définitivement la réinitialisation ?')) {
+                return;
+            }
+
+            try {
+                // Vider toutes les données
+                localStorage.clear();
+                studentsList = [];
+                reportsList = [];
+                referentPassword = INITIAL_CONFIG.referentPassword;
+                
+                // Réappliquer la configuration initiale
+                applyInitialConfiguration();
+                updateDisplay();
+                
+                // Retourner à l'accueil
+                showHome();
+                
+                alert('✅ RÉINITIALISATION TERMINÉE !\n\n' +
+                      'L\'application a été remise à zéro.\n' +
+                      'La configuration initiale a été restaurée.\n\n' +
+                      'Vous pouvez maintenant reconfigurer l\'application.');
+                      
+            } catch (error) {
+                console.error('Erreur réinitialisation:', error);
+                alert('❌ Erreur lors de la réinitialisation !\n\n' +
+                      'Veuillez actualiser la page et réessayer.');
+            }
+        }
+
+        // Déconnexions
+        function studentLogout() {
+            currentUser = null;
+            showHome();
+        }
+
+        function referentLogout() {
+            showHome();
+        }
+
+        function adminLogout() {
+            showHome();
+        }
+
+        // Gestion de la popup de mot de passe
+        function showPasswordModal(password) {
+            document.getElementById('generatedPassword').textContent = password;
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            // currentUser est déjà défini dans handleStudentLogin
+            if (currentUser) {
+                hideAllPages();
+                document.getElementById('studentReportPage').classList.remove('hidden');
+            } else {
+                showHome();
+            }
+        }
+
+        function backToLogin() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            currentUser = null;
+            // Réinitialiser le formulaire de connexion
+            document.getElementById('studentLoginForm').reset();
+            hideAllPages();
+            document.getElementById('studentLoginPage').classList.remove('hidden');
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('generatedPassword').textContent;
+            
+            // Méthode moderne pour copier
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(password).then(() => {
+                    alert('✅ Mot de passe copié dans le presse-papiers !');
+                }).catch(() => {
+                    // Fallback si la copie échoue
+                    fallbackCopy(password);
+                });
+            } else {
+                // Fallback pour les navigateurs plus anciens
+                fallbackCopy(password);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('✅ Mot de passe copié dans le presse-papiers !');
+            } catch (err) {
+                alert('❌ Impossible de copier automatiquement. Sélectionnez et copiez manuellement le mot de passe.');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // Utilitaires
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97282c92b7112a19',t:'MTc1NTc1ODc5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
