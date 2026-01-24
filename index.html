@@ -1,590 +1,796 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Anti-Harcèlement Scolaire</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Cyber Quiz</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+        body {
+            box-sizing: border-box;
         }
-        .card-shadow {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+
+        .question-card {
+            transition: all 0.3s ease;
+        }
+
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            transform: translateX(5px);
+        }
+
+        .correct {
+            background-color: #10b981 !important;
+            color: white !important;
+        }
+
+        .incorrect {
+            background-color: #ef4444 !important;
+            color: white !important;
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
         }
     </style>
-</head>
-<body class="min-h-screen gradient-bg">
-    <div id="app" class="container mx-auto px-4 py-8">
-        <!-- Page d'accueil -->
-        <div id="homePage" class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8 mb-8">
-                <div class="text-center mb-8">
-                    <div id="logoContainer" class="mb-6">
-                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h1 id="schoolTitle" class="text-xl font-bold text-gray-800 mb-4">Application Anti-Harcèlement Scolaire</h1>
-                    <p class="text-lg text-gray-600">Plateforme sécurisée de signalement et de gestion</p>
-                </div>
-
-                <!-- Informations légales -->
-                <div class="bg-red-50 border-l-4 border-red-400 p-6 mb-8">
-                    <h2 class="text-xl font-semibold text-red-800 mb-4">⚠️ Rappel à la loi et informations importantes</h2>
-                    <div class="text-red-700 space-y-2">
-                        <p><strong>Article 222-33-2-2 du Code pénal :</strong> Le harcèlement scolaire est un délit puni de 3 ans d'emprisonnement et 45 000€ d'amende.</p>
-                        <p><strong>Numéro d'urgence :</strong> 3020 (Numéro national "Non au harcèlement")</p>
-                        <p><strong>Cyberharcèlement :</strong> 3018 (Numéro national gratuit)</p>
-                        <p><strong>Urgence :</strong> 15 (SAMU) - 17 (Police) - 18 (Pompiers) - 112 (Urgences européennes)</p>
-                        <p class="text-sm mt-4">Cette application respecte le RGPD. Vos données sont protégées et utilisées uniquement dans le cadre de la lutte contre le harcèlement scolaire.</p>
-                    </div>
-                </div>
-
-                <!-- Boutons principaux -->
-                <div class="grid md:grid-cols-1 gap-6 max-w-sm mx-auto">
-                    <button onclick="showStudentLogin()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-6 rounded-lg transition duration-300 transform hover:scale-105">
-                        <div class="text-center">
-                            <svg class="w-12 h-12 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-                            </svg>
-                            <div class="text-lg">Signaler une situation</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Page de connexion élève -->
-        <div id="studentLoginPage" class="hidden max-w-md mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8">
-                <button onclick="showHome()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
-                    </svg>
-                    Retour
-                </button>
-                
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion Élève</h2>
-                
-                <form id="studentLoginForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Identifiant (fourni par le collège)</label>
-                        <input type="text" id="studentId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nom.prenom" required>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Classe</label>
-                        <select id="studentClass" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner votre classe</option>
-                            <option value="6G1">6G1</option>
-                            <option value="6G2">6G2</option>
-                            <option value="6G3">6G3</option>
-                            <option value="6G4">6G4</option>
-                            <option value="6G5">6G5</option>
-                            <option value="6G6">6G6</option>
-                            <option value="6G7">6G7</option>
-                            <option value="6G8">6G8</option>
-                            <option value="6G9">6G9</option>
-                            <option value="5G1">5G1</option>
-                            <option value="5G2">5G2</option>
-                            <option value="5G3">5G3</option>
-                            <option value="5G4">5G4</option>
-                            <option value="5G5">5G5</option>
-                            <option value="5G6">5G6</option>
-                            <option value="5G7">5G7</option>
-                            <option value="5G8">5G8</option>
-                            <option value="5G9">5G9</option>
-                            <option value="4G1">4G1</option>
-                            <option value="4G2">4G2</option>
-                            <option value="4G3">4G3</option>
-                            <option value="4G4">4G4</option>
-                            <option value="4G5">4G5</option>
-                            <option value="4G6">4G6</option>
-                            <option value="4G7">4G7</option>
-                            <option value="4G8">4G8</option>
-                            <option value="4G9">4G9</option>
-                            <option value="3G1">3G1</option>
-                            <option value="3G2">3G2</option>
-                            <option value="3G3">3G3</option>
-                            <option value="3G4">3G4</option>
-                            <option value="3G5">3G5</option>
-                            <option value="3G6">3G6</option>
-                            <option value="3G7">3G7</option>
-                            <option value="3G8">3G8</option>
-                            <option value="3G9">3G9</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe provisoire</label>
-                        <input type="password" id="studentTempPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                        Se connecter
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Page de signalement élève -->
-        <div id="studentReportPage" class="hidden max-w-2xl mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Signaler une situation</h2>
-                    <button onclick="studentLogout()" class="text-red-600 hover:text-red-800">Déconnexion</button>
-                </div>
-                
-                <form id="reportForm" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Vous êtes :</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="radio" name="role" value="victime" class="mr-2" required>
-                                <span>Victime de harcèlement</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="role" value="temoin" class="mr-2" required>
-                                <span>Témoin de harcèlement</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Lieu des faits</label>
-                        <select id="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner le lieu</option>
-                            <option value="cour">Cour de récréation</option>
-                            <option value="classe">Salle de classe</option>
-                            <option value="couloir">Couloirs</option>
-                            <option value="cantine">Cantine</option>
-                            <option value="toilettes">Toilettes</option>
-                            <option value="transport">Transport scolaire</option>
-                            <option value="internet">Internet/Réseaux sociaux</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Fréquence</label>
-                        <select id="frequency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner la fréquence</option>
-                            <option value="quotidien">Tous les jours</option>
-                            <option value="hebdomadaire">Plusieurs fois par semaine</option>
-                            <option value="occasionnel">De temps en temps</option>
-                            <option value="unique">Une seule fois</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Description de la situation</label>
-                        <textarea id="description" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Décrivez la situation de harcèlement..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
-                        Envoyer le signalement
-                    </button>
-                </form>
-            </div>
-        </div>
-
-
-        <!-- Modal pour afficher le mot de passe généré -->
-        <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-2xl">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-bold text-green-800 mb-2">🎉 Inscription réussie !</h3>
-                    <p class="text-gray-600">Première connexion - Mot de passe généré</p>
-                </div>
-
-                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
-                    <h4 class="text-lg font-semibold text-blue-800 mb-3 text-center">🔐 VOTRE NOUVEAU MOT DE PASSE :</h4>
-                    <div class="bg-white border-2 border-blue-300 rounded-lg p-4 text-center">
-                        <span id="generatedPassword" class="text-2xl font-mono font-bold text-blue-900 select-all"></span>
-                    </div>
-                    <button onclick="copyPassword()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-300">
-                        📋 Copier le mot de passe
-                    </button>
-                </div>
-
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                    <h4 class="font-semibold text-yellow-800 mb-2">📝 ACTIONS OBLIGATOIRES :</h4>
-                    <ul class="text-sm text-yellow-700 space-y-1">
-                        <li>1️⃣ Notez ce mot de passe sur papier</li>
-                        <li>2️⃣ Photographiez cet écran</li>
-                        <li>3️⃣ Copiez-le dans vos notes</li>
-                    </ul>
-                </div>
-
-                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                    <h4 class="font-semibold text-red-800 mb-2">⚠️ TRÈS IMPORTANT :</h4>
-                    <ul class="text-sm text-red-700 space-y-1">
-                        <li>• L'ancien mot de passe ne fonctionne plus</li>
-                        <li>• Ne partagez JAMAIS ce mot de passe</li>
-                        <li>• Si perdu, contactez le référent Phare</li>
-                    </ul>
-                </div>
-
-                <div class="space-y-3">
-                    <button onclick="closePasswordModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
-                        ✅ J'ai sauvegardé mon mot de passe
-                    </button>
-                    <button onclick="backToLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                        🔙 Retour à l'identification
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ========================================
-        // CONFIGURATION INITIALE - À MODIFIER AVANT DIFFUSION
-        // ========================================
-        const INITIAL_CONFIG = {
-            schoolName: "Collège [NOM DE VOTRE ÉTABLISSEMENT]", // Changez le nom ici
-            referentEmails: [
-                "referent1@email.com",
-                "referent2@email.com",
-                "referent3@email.com",
-                "referent4@email.com",
-                "referent5@email.com"
-            ],
-            schoolLogo: null, // Sera défini plus bas si vous avez un logo
-            initialStudents: `
-                // Collez vos listes d'élèves ici, au format : identifiant [TAB] classe [TAB] motdepasse
-                // Exemple :
-                // martin.jean	6G1	mdpjean123
-                // dupont.marie	6G2	mdpmarie456
-            `
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="w-full min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+        const defaultConfig = {
+            background_color: "#0f172a",
+            surface_color: "#1e293b",
+            text_color: "#f1f5f9",
+            primary_action_color: "#3b82f6",
+            secondary_action_color: "#64748b",
+            font_family: "Inter",
+            font_size: 16,
+            quiz_title: "Quiz sur les Réseaux Informatiques",
+            intro_text: "Bienvenue dans ce quiz sur les réseaux informatiques ! Teste tes connaissances sur les routeurs, les adresses IP, et bien plus encore. Tu as 30 minutes pour terminer. Bonne chance !",
+            timer_label: "Temps restant"
         };
 
-        // Logo par défaut en base64 (remplacez par votre logo si nécessaire)
-        // Pour convertir votre logo : https://base64.guru/converter/encode/image
-        // Collez votre logo en base64 entre les guillemets ci-dessous :
-        const DEFAULT_LOGO_BASE64 = null; // "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
-
-        // ========================================
-        // VARIABLES GLOBALES
-        // ========================================
-        let currentUser = null;
-        let studentsList = [];
-
-        // ========================================
-        // INITIALISATION
-        // ========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApplication();
-            setupEventListeners();
-        });
-
-        function initializeApplication() {
-            // Charger les données ou initialiser avec la configuration par défaut
-            loadData();
-            
-            // Appliquer la configuration initiale si c'est la première fois
-            if (!localStorage.getItem('appInitialized')) {
-                applyInitialConfiguration();
-                localStorage.setItem('appInitialized', 'true');
+        const questions = [
+            {
+                id: 1,
+                question: "Quelle est la différence fondamentale entre un commutateur (switch) et un routeur dans l'architecture d'un réseau d'entreprise ?",
+                type: "multiple",
+                options: [
+                    "Le routeur assure la sécurité (pare-feu), tandis que le commutateur stocke les données des utilisateurs.",
+                    "Le commutateur fournit l'accès à Internet, alors que le routeur distribue cet accès aux différents appareils.",
+                    "Le commutateur gère les connexions sans fil (Wi-Fi) et le routeur gère les connexions filaires (Ethernet).",
+                    "Le routeur relie plusieurs réseaux locaux entre eux, tandis que le commutateur relie des équipements au sein d'un même réseau local."
+                ],
+                correct: 3
+            },
+            {
+                id: 2,
+                question: "D'après les documents, qu'est-ce qui caractérise la structure d'une adresse IP ?",
+                type: "multiple",
+                options: [
+                    "Elle est composée de 4 nombres, chacun étant compris entre 0 et 255.",
+                    "Elle est formée de 8 groupes de nombres hexadécimaux.",
+                    "Elle est composée de 4 mots de 16 bits chacun.",
+                    "C'est une adresse textuelle unique comme une URL (par exemple, youtube.fr)."
+                ],
+                correct: 0
+            },
+            {
+                id: 3,
+                question: "En quoi un réseau WLAN se distingue-t-il fondamentalement d'un réseau WAN ?",
+                type: "multiple",
+                options: [
+                    "Le WLAN est une catégorie de LAN, tandis que le WAN est une catégorie d'Internet.",
+                    "Le WLAN utilise exclusivement des ondes radio, tandis que le WAN utilise uniquement la fibre optique.",
+                    "Un WLAN est géré par un point d'accès, tandis qu'un WAN est géré par un serveur.",
+                    "Le WLAN est un réseau sans fil de portée locale (maison, collège), alors que le WAN couvre une zone géographique très étendue (pays, continent)."
+                ],
+                correct: 3
+            },
+            {
+                id: 4,
+                question: "Quelle fonction spécifique justifie l'appellation de \"routeur\" dans un \"routeur Wi-Fi\" ?",
+                type: "multiple",
+                options: [
+                    "Il relie directement les équipements au fournisseur d'accès à Internet.",
+                    "Il choisit la meilleure \"route\" pour les ondes radio afin d'éviter les obstacles.",
+                    "Il génère un sous-réseau local qui lui est propre.",
+                    "Il permet de commuter la connexion entre plusieurs équipements sans fil."
+                ],
+                correct: 2
+            },
+            {
+                id: 5,
+                question: "Parmi les moyens de connexion filaire décrits, lequel utilise des impulsions lumineuses pour transmettre les données ?",
+                type: "multiple",
+                options: [
+                    "Le câble Ethernet",
+                    "Le Modem",
+                    "La fibre optique",
+                    "Le Courant Porteur en Ligne (CPL)"
+                ],
+                correct: 2
+            },
+            {
+                id: 6,
+                question: "Selon les documents, quelle tâche n'est PAS une fonction principale d'un serveur dans un réseau de collège ?",
+                type: "multiple",
+                options: [
+                    "Établir l'interface de connexion entre le réseau et l'extérieur (Internet).",
+                    "Gérer la sécurité des données qui transitent sur le réseau (pare-feu).",
+                    "Stocker les données et les fichiers des utilisateurs.",
+                    "Gérer les autorisations d'accès des utilisateurs."
+                ],
+                correct: 0
+            },
+            {
+                id: 7,
+                question: "Parmi les technologies de communication sans fil mentionnées, laquelle se distingue par l'utilisation d'impulsions lumineuses au lieu d'ondes radio ?",
+                type: "multiple",
+                options: [
+                    "Le Li-Fi",
+                    "Le Satellite",
+                    "Le Bluetooth"
+                ],
+                correct: 0
+            },
+            {
+                id: 8,
+                question: "Quel est le rôle principal d'un \"point d'accès\" dans l'architecture d'un réseau ?",
+                type: "multiple",
+                options: [
+                    "Gérer la sécurité et les autorisations des utilisateurs du réseau sans fil.",
+                    "Relier plusieurs réseaux locaux de différents bâtiments ensemble.",
+                    "Établir la liaison entre un réseau filaire et les terminaux d'un réseau sans fil.",
+                    "Attribuer une adresse IP unique à chaque appareil connecté."
+                ],
+                correct: 2
+            },
+            {
+                id: 9,
+                question: "Dans un sous-réseau informatique comme celui de la \"Salle Techno 1\" du collège, qu'est-ce que les adresses IP des différents appareils ont en commun ?",
+                type: "multiple",
+                options: [
+                    "Elles sont toutes supérieures à 255.",
+                    "Le dernier nombre de leur adresse IP est toujours le même.",
+                    "Elles sont toutes composées uniquement de nombres pairs.",
+                    "Les premiers nombres de leur adresse IP sont identiques."
+                ],
+                correct: 3
+            },
+            {
+                id: 10,
+                question: "Quel équipement a pour fonction principale de connecter plusieurs équipements, comme des ordinateurs et des imprimantes, au sein d'un MÊME réseau local ?",
+                type: "multiple",
+                options: [
+                    "Le routeur",
+                    "Le serveur",
+                    "Le modem",
+                    "Le commutateur (switch)"
+                ],
+                correct: 3
             }
-            
-            // Mettre à jour l'affichage
-            updateDisplay();
-        }
+        ];
 
-        function applyInitialConfiguration() {
-            // Appliquer le nom de l'établissement
-            if (INITIAL_CONFIG.schoolName && INITIAL_CONFIG.schoolName !== "Collège [NOM DE VOTRE ÉTABLISSEMENT]") {
-                localStorage.setItem('schoolName', INITIAL_CONFIG.schoolName);
-            }
-            
-            // Appliquer le logo par défaut
-            if (DEFAULT_LOGO_BASE64) {
-                localStorage.setItem('schoolLogo', DEFAULT_LOGO_BASE64);
-            }
-            
-            // Ajouter les élèves initiaux
-            const initialStudentsParsed = parseInitialStudents(INITIAL_CONFIG.initialStudents);
-            if (initialStudentsParsed.length > 0) {
-                studentsList = [...initialStudentsParsed];
-                localStorage.setItem('studentsList', JSON.stringify(studentsList));
-            }
-        }
+        let currentQuestion = 0;
+        let score = 0;
+        let answers = [];
+        let timeLeft = 1800;
+        let timerInterval = null;
+        let startTime = null;
+        let quizState = "intro";
+        let studentFirstName = "";
+        let studentLastName = "";
+        let studentClass = "";
+        let matchingAnswers = {};
 
-        function loadData() {
-            // Charger les données depuis localStorage
-            const savedStudents = localStorage.getItem('studentsList');
-            if (savedStudents) {
-                studentsList = JSON.parse(savedStudents);
-            }
-        }
-
-        function updateDisplay() {
-            // Mettre à jour le nom de l'établissement
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                document.getElementById('schoolTitle').textContent = savedSchoolName;
-            }
-
-            // Mettre à jour le logo
-            const savedLogo = localStorage.getItem('schoolLogo');
-            if (savedLogo) {
-                document.getElementById('logoContainer').innerHTML = '<img src="' + savedLogo + '" alt="Logo établissement" class="w-24 h-24 mx-auto rounded-full object-cover">';
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem('studentsList', JSON.stringify(studentsList));
-        }
-
-
-        function setupEventListeners() {
-            // Formulaire de connexion élève
-            document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleStudentLogin();
-            });
-
-            // Formulaire de signalement
-            document.getElementById('reportForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleReport();
-            });
-        }
-
-        // Navigation
-        function showHome() {
-            hideAllPages();
-            document.getElementById('homePage').classList.remove('hidden');
-        }
-
-        function showStudentLogin() {
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
-        }
-
-        function hideAllPages() {
-            const pages = ['homePage', 'studentLoginPage', 'studentReportPage'];
-            pages.forEach(pageId => {
-                const page = document.getElementById(pageId);
-                if (page) {
-                    page.classList.add('hidden');
-                }
-            });
-        }
-
-        // Gestion des connexions
-        function handleStudentLogin() {
-            const studentId = document.getElementById('studentId').value.trim().toLowerCase();
-            const studentClass = document.getElementById('studentClass').value;
-            const tempPassword = document.getElementById('studentTempPassword').value.trim();
-
-            // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
-            const student = studentsList.find(s => 
-                s.id.toLowerCase() === studentId && 
-                s.class === studentClass && 
-                s.tempPassword === tempPassword
-            );
-
-            if (student && !student.password) {
-                // PREMIÈRE CONNEXION : Générer un nouveau mot de passe personnel
-                const newPassword = generatePassword();
-                student.password = newPassword;
-                
-                // Sauvegarder immédiatement dans localStorage
-                saveData();
-                
-                // Sauvegarder le mot de passe sur l'appareil de l'élève pour faciliter les connexions futures
-                const studentKey = 'student_' + studentId + '_' + studentClass;
-                localStorage.setItem(studentKey, newPassword);
-                
-                // Afficher le mot de passe dans une popup personnalisée
-                showPasswordModal(newPassword);
-                
-                currentUser = student;
-                
-            } else {
-                // Vérifier si l'élève essaie de se connecter avec son mot de passe personnel (connexions suivantes)
-                const studentWithPassword = studentsList.find(s => 
-                    s.id.toLowerCase() === studentId && 
-                    s.class === studentClass && 
-                    s.password === tempPassword
-                );
-                
-                if (studentWithPassword) {
-                    // Connexion réussie avec le mot de passe personnel
-                    currentUser = studentWithPassword;
-                    hideAllPages();
-                    document.getElementById('studentReportPage').classList.remove('hidden');
-                } else {
-                    // Identifiants incorrects
-                    alert('❌ CONNEXION ÉCHOUÉE\n\n' +
-                          'Vérifiez attentivement :\n' +
-                          '• Votre identifiant (format: nom.prenom)\n' +
-                          '• Votre classe\n' +
-                          '• Votre mot de passe\n\n' +
-                          '🔑 RAPPEL :\n' +
-                          '• PREMIÈRE connexion : utilisez le mot de passe provisoire\n' +
-                          '• Connexions suivantes : utilisez votre mot de passe personnel\n\n' +
-                          '❓ Si vous avez oublié votre mot de passe personnel, contactez le référent Phare.');
-                }
-            }
-        }
-
-        function parseInitialStudents(studentString) {
-            const students = [];
-            const lines = studentString.trim().split('\n');
-
-            lines.forEach(line => {
-                const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('//') || trimmedLine === '') {
-                    return; // Ignorer les commentaires et les lignes vides
-                }
-
-                const parts = trimmedLine.split(/\t+|\s{2,}/).map(part => part.trim());
-                if (parts.length === 3) {
-                    students.push({
-                        id: parts[0],
-                        class: parts[1],
-                        tempPassword: parts[2],
-                        password: null
-                    });
-                }
-            });
-            return students;
-        }
-
-        // Gestion des signalements
-        function handleReport() {
-            const role = document.querySelector('input[name="role"]:checked').value;
-            const location = document.getElementById('location').value;
-            const frequency = document.getElementById('frequency').value;
-            const description = document.getElementById('description').value;
-            const reportDate = new Date().toLocaleDateString('fr-FR');
-
-            // Préparer et envoyer l'email
-            const emails = INITIAL_CONFIG.referentEmails.filter(e => e && !e.startsWith('referent'));
-            if (emails.length > 0) {
-                const to = emails.join(',');
-                const subject = "Signalement Phare";
-                
-                const body = `
-Nouveau signalement reçu :
-
------------------------------------
-INFORMATIONS SUR LE SIGNALEMENT
------------------------------------
-- Signalé par : ${currentUser.id}
-- Classe : ${currentUser.class}
-- Rôle déclaré : ${role}
-- Date : ${reportDate}
-- Lieu des faits : ${location}
-- Fréquence : ${frequency}
-
------------------------------------
-DESCRIPTION DE LA SITUATION
------------------------------------
-${description}
-
------------------------------------
-Ceci est un message automatique généré par l'application Anti-Harcèlement.
-                `.trim();
-
-                const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailtoLink;
-            }
-
-            alert('Signalement envoyé ! Votre application d\'email va s\'ouvrir. N\'oubliez pas d\'appuyer sur \'Envoyer\'.');
-            document.getElementById('reportForm').reset();
-            studentLogout(); // Déconnexion après envoi
-        }
-
-        // Déconnexions
-        function studentLogout() {
-            currentUser = null;
-            showHome();
-        }
-
-        // Gestion de la popup de mot de passe
-        function showPasswordModal(password) {
-            document.getElementById('generatedPassword').textContent = password;
-            document.getElementById('passwordModal').classList.remove('hidden');
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').classList.add('hidden');
-            // currentUser est déjà défini dans handleStudentLogin
-            if (currentUser) {
-                hideAllPages();
-                document.getElementById('studentReportPage').classList.remove('hidden');
-            } else {
-                showHome();
-            }
-        }
-
-        function backToLogin() {
-            document.getElementById('passwordModal').classList.add('hidden');
-            currentUser = null;
-            // Réinitialiser le formulaire de connexion
-            document.getElementById('studentLoginForm').reset();
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
-        }
-
-        function copyPassword() {
-            const password = document.getElementById('generatedPassword').textContent;
-            
-            // Méthode moderne pour copier
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(password).then(() => {
-                    alert('✅ Mot de passe copié dans le presse-papiers !');
-                }).catch(() => {
-                    // Fallback si la copie échoue
-                    fallbackCopy(password);
+        async function initApp() {
+            if (window.elementSdk) {
+                await window.elementSdk.init({
+                    defaultConfig,
+                    onConfigChange: async (config) => {
+                        updateUI(config);
+                    },
+                    mapToCapabilities: (config) => ({
+                        recolorables: [
+                            {
+                                get: () => config.background_color || defaultConfig.background_color,
+                                set: (value) => {
+                                    config.background_color = value;
+                                    window.elementSdk.setConfig({ background_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.surface_color || defaultConfig.surface_color,
+                                set: (value) => {
+                                    config.surface_color = value;
+                                    window.elementSdk.setConfig({ surface_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.text_color || defaultConfig.text_color,
+                                set: (value) => {
+                                    config.text_color = value;
+                                    window.elementSdk.setConfig({ text_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                                set: (value) => {
+                                    config.primary_action_color = value;
+                                    window.elementSdk.setConfig({ primary_action_color: value });
+                                }
+                            },
+                            {
+                                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                                set: (value) => {
+                                    config.secondary_action_color = value;
+                                    window.elementSdk.setConfig({ secondary_action_color: value });
+                                }
+                            }
+                        ],
+                        borderables: [],
+                        fontEditable: {
+                            get: () => config.font_family || defaultConfig.font_family,
+                            set: (value) => {
+                                config.font_family = value;
+                                window.elementSdk.setConfig({ font_family: value });
+                            }
+                        },
+                        fontSizeable: {
+                            get: () => config.font_size || defaultConfig.font_size,
+                            set: (value) => {
+                                config.font_size = value;
+                                window.elementSdk.setConfig({ font_size: value });
+                            }
+                        }
+                    }),
+                    mapToEditPanelValues: (config) => new Map([
+                        ["quiz_title", config.quiz_title || defaultConfig.quiz_title],
+                        ["intro_text", config.intro_text || defaultConfig.intro_text],
+                        ["timer_label", config.timer_label || defaultConfig.timer_label]
+                    ])
                 });
+            }
+
+            render();
+        }
+
+        function updateUI(config) {
+            const fontFamily = config.font_family || defaultConfig.font_family;
+            const fontSize = config.font_size || defaultConfig.font_size;
+            const backgroundColor = config.background_color || defaultConfig.background_color;
+            const surfaceColor = config.surface_color || defaultConfig.surface_color;
+            const textColor = config.text_color || defaultConfig.text_color;
+            const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+            const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+
+            document.body.style.fontFamily = `${fontFamily}, sans-serif`;
+            document.body.style.backgroundColor = backgroundColor;
+            document.body.style.color = textColor;
+
+            const appElement = document.getElementById('app');
+            if (appElement) {
+                appElement.style.backgroundColor = backgroundColor;
+            }
+
+            const surfaces = document.querySelectorAll('.surface');
+            surfaces.forEach(el => el.style.backgroundColor = surfaceColor);
+
+            const titles = document.querySelectorAll('.title');
+            titles.forEach(el => {
+                el.style.fontSize = `${fontSize * 2}px`;
+                el.style.color = textColor;
+            });
+
+            const subtitles = document.querySelectorAll('.subtitle');
+            subtitles.forEach(el => {
+                el.style.fontSize = `${fontSize * 1.25}px`;
+                el.style.color = textColor;
+            });
+
+            const bodyTexts = document.querySelectorAll('.body-text');
+            bodyTexts.forEach(el => {
+                el.style.fontSize = `${fontSize}px`;
+                el.style.color = textColor;
+            });
+
+            const primaryButtons = document.querySelectorAll('.primary-btn');
+            primaryButtons.forEach(el => {
+                el.style.backgroundColor = primaryColor;
+                el.style.fontSize = `${fontSize}px`;
+            });
+
+            const secondaryButtons = document.querySelectorAll('.secondary-btn');
+            secondaryButtons.forEach(el => {
+                el.style.backgroundColor = secondaryColor;
+                el.style.fontSize = `${fontSize * 0.9}px`;
+            });
+
+            const optionButtons = document.querySelectorAll('.option-btn:not(.correct):not(.incorrect)');
+            optionButtons.forEach(el => {
+                el.style.backgroundColor = surfaceColor;
+                el.style.color = textColor;
+                el.style.fontSize = `${fontSize}px`;
+            });
+
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                timerElement.style.color = textColor;
+                timerElement.style.fontSize = `${fontSize * 1.25}px`;
+            }
+
+            const progressText = document.getElementById('progress-text');
+            if (progressText) {
+                progressText.style.color = textColor;
+                progressText.style.fontSize = `${fontSize * 0.9}px`;
+            }
+        }
+
+        function render() {
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const app = document.getElementById('app');
+
+            if (quizState === "intro") {
+                app.innerHTML = `
+                    <div class="w-full min-h-full flex items-center justify-center p-8">
+                        <div class="surface max-w-2xl w-full rounded-2xl shadow-2xl p-12">
+                            <div class="text-center mb-8">
+                                <div class="text-6xl mb-6">🛡️</div>
+                                <h1 class="title font-bold mb-4">${config.quiz_title || defaultConfig.quiz_title}</h1>
+                                <p class="body-text mb-8">${config.intro_text || defaultConfig.intro_text}</p>
+                            </div>
+                            <div class="mb-8 space-y-4">
+                                <div>
+                                    <label for="firstname-input" class="body-text block mb-2 font-semibold">Ton prénom :</label>
+                                    <input type="text" id="firstname-input" placeholder="Entre ton prénom" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
+                                </div>
+                                <div>
+                                    <label for="lastname-input" class="body-text block mb-2 font-semibold">Ton nom :</label>
+                                    <input type="text" id="lastname-input" placeholder="Entre ton nom" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
+                                </div>
+                                <div>
+                                    <label for="class-input" class="body-text block mb-2 font-semibold">Ta classe :</label>
+                                    <input type="text" id="class-input" placeholder="Entre ta classe" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
+                                </div>
+                            </div>
+                            <p class="body-text text-center mb-4">Attention, vous n'avez qu'un seul essai et l'envoi des résultats est <strong style="color: #ef4444;">automatique</strong>.</p>
+                            <button
+                                id="start-btn"
+                                class="primary-btn w-full py-4 rounded-lg font-bold hover:opacity-90 transition"
+                            >
+                                Commencer la Mission 🚀
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('start-btn').addEventListener('click', startQuiz);
+                document.getElementById('firstname-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') startQuiz();
+                });
+                document.getElementById('lastname-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') startQuiz();
+                });
+                document.getElementById('class-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') startQuiz();
+                });
+            } else if (quizState === "quiz") {
+                renderQuiz();
+            } else if (quizState === "results") {
+                renderResults();
+            }
+
+            updateUI(config);
+        }
+
+        function startQuiz() {
+            const firstNameInput = document.getElementById('firstname-input');
+            const lastNameInput = document.getElementById('lastname-input');
+            const classInput = document.getElementById('class-input');
+
+            studentFirstName = firstNameInput.value.trim();
+            studentLastName = lastNameInput.value.trim();
+            studentClass = classInput.value.trim();
+
+            let isValid = true;
+            if (!studentFirstName) {
+                isValid = false;
+                firstNameInput.style.borderColor = '#ef4444';
             } else {
-                // Fallback pour les navigateurs plus anciens
-                fallbackCopy(password);
+                firstNameInput.style.borderColor = '';
+            }
+            if (!studentLastName) {
+                isValid = false;
+                lastNameInput.style.borderColor = '#ef4444';
+            } else {
+                lastNameInput.style.borderColor = '';
+            }
+            if (!studentClass) {
+                isValid = false;
+                classInput.style.borderColor = '#ef4444';
+            } else {
+                classInput.style.borderColor = '';
+            }
+
+            if (!isValid) {
+                let feedback = document.getElementById('start-feedback');
+                if (!feedback) {
+                    feedback = document.createElement('p');
+                    feedback.id = 'start-feedback';
+                    feedback.className = 'body-text mt-2';
+                    feedback.style.color = '#ef4444';
+                    const startButton = document.getElementById('start-btn');
+                    startButton.parentElement.insertBefore(feedback, startButton.nextSibling);
+                }
+                feedback.textContent = 'Veuillez remplir tous les champs pour commencer !';
+                return;
+            }
+
+            quizState = "quiz";
+            startTime = Date.now();
+            startTimer();
+            render();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('timer');
+            if (timerElement) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 60) {
+                    timerElement.classList.add('pulse');
+                    timerElement.style.color = '#ef4444';
+                }
             }
         }
 
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
+        function renderQuiz() {
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const app = document.getElementById('app');
+            const q = questions[currentQuestion];
+
+            app.innerHTML = `
+                <div class="w-full min-h-full p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="surface rounded-xl shadow-lg p-6 mb-6">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p id="progress-text" class="font-semibold">Question ${currentQuestion + 1}/${questions.length}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="body-text">${config.timer_label || defaultConfig.timer_label} :</span>
+                                    <span id="timer" class="subtitle font-bold"></span>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-700 h-2 rounded-full mt-4">
+                                <div class="h-full rounded-full transition-all duration-300"
+                                     style="width: ${((currentQuestion + 1) / questions.length) * 100}%; background-color: ${config.primary_action_color || defaultConfig.primary_action_color}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="surface question-card rounded-2xl shadow-2xl p-8">
+                            <h2 class="subtitle font-bold mb-6">${q.question}</h2>
+                            <div id="question-content"></div>
+                            <div id="feedback" class="mt-6"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateTimerDisplay();
+            renderQuestion(q);
+            updateUI(config);
+        }
+
+        function renderQuestion(q) {
+            const content = document.getElementById('question-content');
+
+            if (q.type === "multiple") {
+                content.innerHTML = q.options.map((option, index) => `
+                    <button
+                        class="option-btn w-full text-left px-6 py-4 rounded-lg mb-3 border-2 border-gray-600 hover:border-blue-500"
+                        data-index="${index}"
+                    >
+                        ${option}
+                    </button>
+                `).join('');
+
+                content.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => handleMultipleChoice(parseInt(btn.dataset.index)));
+                });
+            } else if (q.type === "boolean") {
+                content.innerHTML = `
+                    <div class="flex gap-4">
+                        <button class="option-btn flex-1 px-6 py-4 rounded-lg border-2 border-gray-600 hover:border-blue-500" data-answer="true">
+                            Vrai ✓
+                        </button>
+                        <button class="option-btn flex-1 px-6 py-4 rounded-lg border-2 border-gray-600 hover:border-blue-500" data-answer="false">
+                            Faux ✗
+                        </button>
+                    </div>
+                `;
+
+                content.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => handleBoolean(btn.dataset.answer === 'true'));
+                });
+            } else if (q.type === "text") {
+                content.innerHTML = `
+                    <input
+                        type="text"
+                        id="text-answer"
+                        placeholder="Ta réponse..."
+                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500 mb-4"
+                    />
+                    <button id="submit-text" class="primary-btn px-8 py-3 rounded-lg font-bold hover:opacity-90">
+                        Valider
+                    </button>
+                `;
+
+                document.getElementById('submit-text').addEventListener('click', handleTextAnswer);
+                document.getElementById('text-answer').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleTextAnswer();
+                });
+            } else if (q.type === "matching") {
+                matchingAnswers = {};
+                content.innerHTML = `
+                    ${q.pairs.map((pair, index) => `
+                        <div class="mb-4 p-4 rounded-lg border-2 border-gray-600">
+                            <p class="body-text font-semibold mb-2">${pair.term}</p>
+                            <select class="w-full px-4 py-2 rounded-lg bg-gray-800 border-2 border-gray-600" data-term="${pair.term}">
+                                <option value="">Choisir une définition...</option>
+                                ${q.pairs.map(p => `<option value="${p.definition}">${p.definition}</option>`).join('')}
+                            </select>
+                        </div>
+                    `).join('')}
+                    <button id="submit-matching" class="primary-btn px-8 py-3 rounded-lg font-bold hover:opacity-90 mt-4">
+                        Valider
+                    </button>
+                `;
+
+                content.querySelectorAll('select').forEach(select => {
+                    select.addEventListener('change', (e) => {
+                        matchingAnswers[e.target.dataset.term] = e.target.value;
+                    });
+                });
+
+                document.getElementById('submit-matching').addEventListener('click', handleMatching);
+            }
+        }
+
+        function handleMultipleChoice(index) {
+            const q = questions[currentQuestion];
+            const isCorrect = index === q.correct;
+
+            answers.push({ question: q.id, correct: isCorrect });
+            if (isCorrect) score++;
+
+            showFeedback(isCorrect, q.options[q.correct]);
+
+            document.querySelectorAll('.option-btn').forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                } else if (i === index && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function handleBoolean(answer) {
+            const q = questions[currentQuestion];
+            const isCorrect = answer === q.correct;
+
+            answers.push({ question: q.id, correct: isCorrect });
+            if (isCorrect) score++;
+
+            showFeedback(isCorrect, q.correct ? "Vrai" : "Faux");
+
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                const btnAnswer = btn.dataset.answer === 'true';
+                if (btnAnswer === q.correct) {
+                    btn.classList.add('correct');
+                } else if (btnAnswer === answer && !isCorrect) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function handleTextAnswer() {
+            const input = document.getElementById('text-answer');
+            const answer = input.value.trim().toUpperCase();
+            const q = questions[currentQuestion];
+
+            if (!answer) return;
+
+            let isCorrect = true;
+            if (q.correct) {
+                isCorrect = answer === q.correct.toUpperCase();
+            }
+
+            answers.push({ question: q.id, correct: isCorrect, answer: answer });
+            if (isCorrect) score++;
+
+            showFeedback(isCorrect, q.correct || "Réponse enregistrée");
+
+            input.disabled = true;
+            document.getElementById('submit-text').disabled = true;
+
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function handleMatching() {
+            const q = questions[currentQuestion];
+            let isCorrect = true;
+
+            for (const pair of q.pairs) {
+                if (matchingAnswers[pair.term] !== pair.definition) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            answers.push({ question: q.id, correct: isCorrect });
+            if (isCorrect) score++;
+
+            showFeedback(isCorrect, "Toutes les correspondances sont correctes");
+
+            document.getElementById('submit-matching').disabled = true;
+            document.querySelectorAll('select').forEach(s => s.disabled = true);
+
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function showFeedback(isCorrect, correctAnswer) {
+            const feedback = document.getElementById('feedback');
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+
+            if (isCorrect) {
+                feedback.innerHTML = `
+                    <div class="p-4 rounded-lg" style="background-color: #10b981;">
+                        <p class="body-text font-bold">✓ Correct ! Bien joué ! 🎉</p>
+                    </div>
+                `;
+            } else {
+                feedback.innerHTML = `
+                    <div class="p-4 rounded-lg" style="background-color: #ef4444;">
+                        <p class="body-text font-bold">✗ Incorrect</p>
+                        <p class="body-text">La bonne réponse : ${correctAnswer}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion >= questions.length) {
+                endQuiz();
+            } else {
+                render();
+            }
+        }
+
+        async function endQuiz() {
+            clearInterval(timerInterval);
+            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
+            quizState = "results";
+
+            const formData = new FormData();
+            formData.append('prénom', studentFirstName);
+            formData.append('nom', studentLastName);
+            formData.append('classe', studentClass);
+            formData.append('score', `${score}/${questions.length}`);
+            formData.append('temps_secondes', timeTaken);
+
             try {
-                document.execCommand('copy');
-                alert('✅ Mot de passe copié dans le presse-papiers !');
-            } catch (err) {
-                alert('❌ Impossible de copier automatiquement. Sélectionnez et copiez manuellement le mot de passe.');
+                const response = await fetch('https://formspree.io/f/mgvglylz', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error("Erreur lors de l'envoi du formulaire Formspree");
+                }
+            } catch (error) {
+                console.error("Erreur lors de l'envoi des résultats :", error);
             }
-            
-            document.body.removeChild(textArea);
+
+            render();
         }
 
-        // Utilitaires
-        function generatePassword() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let password = '';
-            for (let i = 0; i < 8; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
+        function renderResults() {
+            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+            const app = document.getElementById('app');
+            const percentage = Math.round((score / questions.length) * 100);
+            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+
+            let emoji = "🎉";
+            let message = "Excellent travail !";
+
+            if (percentage < 50) {
+                emoji = "💪";
+                message = "Continue à t'entraîner !";
+            } else if (percentage < 70) {
+                emoji = "👍";
+                message = "Bon travail !";
+            } else if (percentage < 90) {
+                emoji = "🌟";
+                message = "Très bien !";
             }
-            return password;
+
+            app.innerHTML = `
+                <div class="w-full min-h-full p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="surface rounded-2xl shadow-2xl p-12 text-center mb-8">
+                            <div class="text-7xl mb-6">${emoji}</div>
+                            <h1 class="title font-bold mb-4">Mission Terminée !</h1>
+                            <p class="subtitle mb-8">${message}</p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
+                                    <p class="body-text mb-2">Score</p>
+                                    <p class="title font-bold">${score}/${questions.length}</p>
+                                    <p class="body-text">${percentage}%</p>
+                                </div>
+                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
+                                    <p class="body-text mb-2">Temps</p>
+                                    <p class="title font-bold">${minutes}:${seconds.toString().padStart(2, '0')}</p>
+                                </div>
+                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
+                                    <p class="body-text mb-2">Étudiant</p>
+                                    <p class="subtitle font-bold">${studentFirstName} ${studentLastName}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateUI(config);
         }
+
+        initApp();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97282c92b7112a19',t:'MTc1NTc1ODc5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aabfa933109018c',t:'MTc2NTE5MzkzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
