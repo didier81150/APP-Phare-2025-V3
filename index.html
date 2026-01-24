@@ -1,590 +1,483 @@
+<!-- ESCAPE GAME TECHNOLOGIE - REVISION BREVET - V2.1 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Anti-Harcèlement Scolaire</title>
+    <title>Escape Game Technologie - Révision Brevet</title>
+    <!-- Chargement des bibliothèques via CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
         }
-        .card-shadow {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite;
         }
     </style>
 </head>
-<body class="min-h-screen gradient-bg">
-    <div id="app" class="container mx-auto px-4 py-8">
-        <!-- Page d'accueil -->
-        <div id="homePage" class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8 mb-8">
-                <div class="text-center mb-8">
-                    <div id="logoContainer" class="mb-6">
-                        <div class="w-24 h-24 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h1 id="schoolTitle" class="text-xl font-bold text-gray-800 mb-4">Application Anti-Harcèlement Scolaire</h1>
-                    <p class="text-lg text-gray-600">Plateforme sécurisée de signalement et de gestion</p>
-                </div>
+<body>
+    <div id="root"></div>
 
-                <!-- Informations légales -->
-                <div class="bg-red-50 border-l-4 border-red-400 p-6 mb-8">
-                    <h2 class="text-xl font-semibold text-red-800 mb-4">⚠️ Rappel à la loi et informations importantes</h2>
-                    <div class="text-red-700 space-y-2">
-                        <p><strong>Article 222-33-2-2 du Code pénal :</strong> Le harcèlement scolaire est un délit puni de 3 ans d'emprisonnement et 45 000€ d'amende.</p>
-                        <p><strong>Numéro d'urgence :</strong> 3020 (Numéro national "Non au harcèlement")</p>
-                        <p><strong>Cyberharcèlement :</strong> 3018 (Numéro national gratuit)</p>
-                        <p><strong>Urgence :</strong> 15 (SAMU) - 17 (Police) - 18 (Pompiers) - 112 (Urgences européennes)</p>
-                        <p class="text-sm mt-4">Cette application respecte le RGPD. Vos données sont protégées et utilisées uniquement dans le cadre de la lutte contre le harcèlement scolaire.</p>
-                    </div>
-                </div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-                <!-- Boutons principaux -->
-                <div class="grid md:grid-cols-1 gap-6 max-w-sm mx-auto">
-                    <button onclick="showStudentLogin()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-6 rounded-lg transition duration-300 transform hover:scale-105">
-                        <div class="text-center">
-                            <svg class="w-12 h-12 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-                            </svg>
-                            <div class="text-lg">Signaler une situation</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Page de connexion élève -->
-        <div id="studentLoginPage" class="hidden max-w-md mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8">
-                <button onclick="showHome()" class="mb-6 text-blue-600 hover:text-blue-800 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
-                    </svg>
-                    Retour
-                </button>
-                
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Connexion Élève</h2>
-                
-                <form id="studentLoginForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Identifiant (fourni par le collège)</label>
-                        <input type="text" id="studentId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="nom.prenom" required>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Classe</label>
-                        <select id="studentClass" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner votre classe</option>
-                            <option value="6G1">6G1</option>
-                            <option value="6G2">6G2</option>
-                            <option value="6G3">6G3</option>
-                            <option value="6G4">6G4</option>
-                            <option value="6G5">6G5</option>
-                            <option value="6G6">6G6</option>
-                            <option value="6G7">6G7</option>
-                            <option value="6G8">6G8</option>
-                            <option value="6G9">6G9</option>
-                            <option value="5G1">5G1</option>
-                            <option value="5G2">5G2</option>
-                            <option value="5G3">5G3</option>
-                            <option value="5G4">5G4</option>
-                            <option value="5G5">5G5</option>
-                            <option value="5G6">5G6</option>
-                            <option value="5G7">5G7</option>
-                            <option value="5G8">5G8</option>
-                            <option value="5G9">5G9</option>
-                            <option value="4G1">4G1</option>
-                            <option value="4G2">4G2</option>
-                            <option value="4G3">4G3</option>
-                            <option value="4G4">4G4</option>
-                            <option value="4G5">4G5</option>
-                            <option value="4G6">4G6</option>
-                            <option value="4G7">4G7</option>
-                            <option value="4G8">4G8</option>
-                            <option value="4G9">4G9</option>
-                            <option value="3G1">3G1</option>
-                            <option value="3G2">3G2</option>
-                            <option value="3G3">3G3</option>
-                            <option value="3G4">3G4</option>
-                            <option value="3G5">3G5</option>
-                            <option value="3G6">3G6</option>
-                            <option value="3G7">3G7</option>
-                            <option value="3G8">3G8</option>
-                            <option value="3G9">3G9</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe provisoire</label>
-                        <input type="password" id="studentTempPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                        Se connecter
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Page de signalement élève -->
-        <div id="studentReportPage" class="hidden max-w-2xl mx-auto">
-            <div class="bg-white rounded-lg card-shadow p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Signaler une situation</h2>
-                    <button onclick="studentLogout()" class="text-red-600 hover:text-red-800">Déconnexion</button>
-                </div>
-                
-                <form id="reportForm" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Vous êtes :</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="radio" name="role" value="victime" class="mr-2" required>
-                                <span>Victime de harcèlement</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="role" value="temoin" class="mr-2" required>
-                                <span>Témoin de harcèlement</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Lieu des faits</label>
-                        <select id="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner le lieu</option>
-                            <option value="cour">Cour de récréation</option>
-                            <option value="classe">Salle de classe</option>
-                            <option value="couloir">Couloirs</option>
-                            <option value="cantine">Cantine</option>
-                            <option value="toilettes">Toilettes</option>
-                            <option value="transport">Transport scolaire</option>
-                            <option value="internet">Internet/Réseaux sociaux</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Fréquence</label>
-                        <select id="frequency" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Sélectionner la fréquence</option>
-                            <option value="quotidien">Tous les jours</option>
-                            <option value="hebdomadaire">Plusieurs fois par semaine</option>
-                            <option value="occasionnel">De temps en temps</option>
-                            <option value="unique">Une seule fois</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Description de la situation</label>
-                        <textarea id="description" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Décrivez la situation de harcèlement..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
-                        Envoyer le signalement
-                    </button>
-                </form>
-            </div>
-        </div>
-
-
-        <!-- Modal pour afficher le mot de passe généré -->
-        <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 max-w-md mx-4 shadow-2xl">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-bold text-green-800 mb-2">🎉 Inscription réussie !</h3>
-                    <p class="text-gray-600">Première connexion - Mot de passe généré</p>
-                </div>
-
-                <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
-                    <h4 class="text-lg font-semibold text-blue-800 mb-3 text-center">🔐 VOTRE NOUVEAU MOT DE PASSE :</h4>
-                    <div class="bg-white border-2 border-blue-300 rounded-lg p-4 text-center">
-                        <span id="generatedPassword" class="text-2xl font-mono font-bold text-blue-900 select-all"></span>
-                    </div>
-                    <button onclick="copyPassword()" class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-300">
-                        📋 Copier le mot de passe
-                    </button>
-                </div>
-
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                    <h4 class="font-semibold text-yellow-800 mb-2">📝 ACTIONS OBLIGATOIRES :</h4>
-                    <ul class="text-sm text-yellow-700 space-y-1">
-                        <li>1️⃣ Notez ce mot de passe sur papier</li>
-                        <li>2️⃣ Photographiez cet écran</li>
-                        <li>3️⃣ Copiez-le dans vos notes</li>
-                    </ul>
-                </div>
-
-                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                    <h4 class="font-semibold text-red-800 mb-2">⚠️ TRÈS IMPORTANT :</h4>
-                    <ul class="text-sm text-red-700 space-y-1">
-                        <li>• L'ancien mot de passe ne fonctionne plus</li>
-                        <li>• Ne partagez JAMAIS ce mot de passe</li>
-                        <li>• Si perdu, contactez le référent Phare</li>
-                    </ul>
-                </div>
-
-                <div class="space-y-3">
-                    <button onclick="closePasswordModal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-md transition duration-300">
-                        ✅ J'ai sauvegardé mon mot de passe
-                    </button>
-                    <button onclick="backToLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300">
-                        🔙 Retour à l'identification
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ========================================
-        // CONFIGURATION INITIALE - À MODIFIER AVANT DIFFUSION
-        // ========================================
-        const INITIAL_CONFIG = {
-            schoolName: "Collège [NOM DE VOTRE ÉTABLISSEMENT]", // Changez le nom ici
-            referentEmails: [
-                "referent1@email.com",
-                "referent2@email.com",
-                "referent3@email.com",
-                "referent4@email.com",
-                "referent5@email.com"
+        // =========================================================================
+        // BANQUE D'ÉNIGMES (Éditables par les élèves/professeurs)
+        // =========================================================================
+        const BANQUE_ENIGMES = {
+            "Évolution Technologique": [
+                { q: "Quelle invention a permis le développement du streaming vidéo ?", r: "INTERNET", h: "C'est un réseau mondial." },
+                { q: "En quelle année est sorti le premier iPhone ?", r: "2007", h: "C'est dans les années 2000." },
+                { q: "Quel est l'ancêtre d'Internet créé par l'armée américaine ?", r: "ARPANET", h: "Commence par A." },
+                { q: "Qui a inventé le World Wide Web ?", r: "TIM BERNERS-LEE", h: "Initiales TBL." },
+                { q: "Quel était le nom du premier ordinateur électronique ?", r: "ENIAC", h: "4 lettres, commence par E." },
+                { q: "Qui a inventé l'imprimerie ?", r: "GUTENBERG", h: "XVème siècle." },
+                { q: "Quel ingénieur a breveté le téléphone en 1876 ?", r: "BELL", h: "Comme une cloche en anglais." },
+                { q: "Qui a inventé la machine à vapeur perfectionnée en 1769 ?", r: "JAMES WATT", h: "Son nom est une unité de puissance." },
+                { q: "Quel est le nom du premier satellite artificiel ?", r: "SPOUTNIK", h: "Lancé par l'URSS." },
+                { q: "Qui a inventé l'ampoule électrique à incandescence ?", r: "EDISON", h: "Thomas..." },
+                { q: "Quel est le créateur du système Linux ?", r: "LINUS TORVALDS", h: "Prénom proche du nom." },
+                { q: "En quelle année a été inventé le transistor ?", r: "1947", h: "Juste après la seconde guerre mondiale." },
+                { q: "Quel est le premier microprocesseur de l'histoire ?", r: "INTEL 4004", h: "Marque célèbre + 4004." },
+                { q: "Quel langage de programmation a été créé en 1957 pour le calcul ?", r: "FORTRAN", h: "FORmula TRANslation." },
+                { q: "Quel objet permettait de stocker des données avant la clé USB ?", r: "DISQUETTE", h: "Elle était carrée et souple." },
+                { q: "Qui a inventé le vaccin contre la rage ?", r: "PASTEUR", h: "Scientifique français célèbre." },
+                { q: "Quelle invention de 1885 a révolutionné le transport individuel ?", r: "AUTOMOBILE", h: "Carl Benz." },
+                { q: "Quel engin a permis d'explorer la Lune en 1969 ?", r: "APOLLO 11", h: "Mission de la NASA." },
+                { q: "Qui a découvert la radioactivité ?", r: "MARIE CURIE", h: "Deux prix Nobel." },
+                { q: "Quel outil de calcul mécanique a précédé la calculatrice ?", r: "BOULIER", h: "Toujours utilisé en Asie." }
             ],
-            schoolLogo: null, // Sera défini plus bas si vous avez un logo
-            initialStudents: `
-                // Collez vos listes d'élèves ici, au format : identifiant [TAB] classe [TAB] motdepasse
-                // Exemple :
-                // martin.jean	6G1	mdpjean123
-                // dupont.marie	6G2	mdpmarie456
-            `
+            "Matériaux et Objets": [
+                { q: "Quel métal est le meilleur conducteur électrique usuel ?", r: "CUIVRE", h: "De couleur orangée." },
+                { q: "Comment appelle-t-on un mélange de fer et de carbone ?", r: "ACIER", h: "Utilisé dans le bâtiment." },
+                { q: "Quelle propriété désigne la capacité d'un matériau à résister aux chocs ?", r: "TENACITE", h: "Inverse de la fragilité." },
+                { q: "Quelle est la matière première principale du verre ?", r: "SABLE", h: "Se trouve sur la plage." },
+                { q: "De quelle ressource naturelle provient la majorité des plastiques ?", r: "PETROLE", h: "Énergie fossile noire." },
+                { q: "Comment appelle-t-on la capacité d'un matériau à être étiré sans rompre ?", r: "DUCTILITE", h: "Permet de faire des fils." },
+                { q: "Quel matériau est un excellent isolant thermique utilisé dans les combles ?", r: "LAINE DE VERRE", h: "Laine minérale." },
+                { q: "De quel arbre provient le caoutchouc naturel ?", r: "HEVEA", h: "Arbre d'Amazonie." },
+                { q: "Quelle propriété permet à un matériau de reprendre sa forme initiale ?", r: "ELASTICITE", h: "Comme un ressort." },
+                { q: "Quel métal léger est massivement utilisé en aéronautique ?", r: "ALUMINIUM", h: "Symbole Al." },
+                { q: "Comment appelle-t-on un matériau qui ne conduit pas l'électricité ?", r: "ISOLANT", h: "Contraire de conducteur." },
+                { q: "À quelle famille appartiennent l'or, l'argent et le fer ?", r: "METAUX", h: "Ils sont brillants et conducteurs." },
+                { q: "Quel est le terme pour un mélange de deux ou plusieurs métaux ?", r: "ALLIAGE", h: "Le bronze en est un." },
+                { q: "Quelle propriété mesure la résistance à la rayure ?", r: "DURETE", h: "L'échelle de Mohs la mesure." },
+                { q: "Comment appelle-t-on la dégradation des métaux par l'oxygène ?", r: "CORROSION", h: "La rouille en est une forme." },
+                { q: "Quel matériau est issu de la cuisson de l'argile ?", r: "CERAMIQUE", h: "Utilisé pour la vaisselle." },
+                { q: "Quel alliage de cuivre et de zinc est utilisé en décoration ?", r: "LAITON", h: "De couleur jaune." },
+                { q: "Quel matériau naturel est composé de cellulose et de lignine ?", r: "BOIS", h: "Issu des arbres." },
+                { q: "Quelle propriété désigne un matériau qui se casse sans se déformer ?", r: "FRAGILITE", h: "Comme le verre." },
+                { q: "Quel matériau est capable d'être attiré par un aimant ?", r: "FERROMAGNETIQUE", h: "Le fer en est un." }
+            ],
+            "Énergie et Environnement": [
+                { q: "Quelle machine transforme l'énergie du vent en électricité ?", r: "EOLIENNE", h: "Énergie cinétique de l'air." },
+                { q: "Comment appelle-t-on l'énergie issue de la lumière du soleil ?", r: "PHOTOVOLTAIQUE", h: "Effet PV." },
+                { q: "Quel est le principal gaz responsable de l'effet de serre ?", r: "CO2", h: "Dioxyde de carbone." },
+                { q: "Citez une énergie fossile non renouvelable.", r: "PETROLE", h: "L'or noir." },
+                { q: "Quelle est l'unité de mesure de la puissance électrique ?", r: "WATT", h: "Symbole W." },
+                { q: "Comment appelle-t-on l'énergie produite par le mouvement de l'eau ?", r: "HYDRAULIQUE", h: "Barrages." },
+                { q: "Quel minerai est utilisé comme combustible dans les centrales nucléaires ?", r: "URANIUM", h: "Symbole U." },
+                { q: "Quel composant transforme un mouvement rotatif en électricité ?", r: "ALTERNATEUR", h: "Présent dans les éoliennes." },
+                { q: "Quel dispositif permet de stocker l'énergie sous forme chimique ?", r: "BATTERIE", h: "Ou accumulateur." },
+                { q: "Comment appelle-t-on l'énergie issue de la chaleur de la terre ?", r: "GEOTHERMIE", h: "Géo = Terre." },
+                { q: "Quel terme désigne l'énergie issue de la combustion du bois ?", r: "BIOMASSE", h: "Matière organique." },
+                { q: "Quel appareil capte la chaleur du soleil pour chauffer de l'eau ?", r: "CAPTEUR SOLAIRE", h: "Solaire thermique." },
+                { q: "Comment appelle-t-on l'évaluation de l'impact CO2 d'un objet ?", r: "EMPREINTE CARBONE", h: "Mesure l'impact climat." },
+                { q: "Quel est le but de l'isolation thermique dans une maison ?", r: "ECONOMISER L'ENERGIE", h: "Réduire les pertes." },
+                { q: "Comment s'appelle le symbole universel du recyclage ?", r: "RUBAN DE MOEBIUS", h: "Boucle de 3 flèches." },
+                { q: "Quel type d'énergie utilise la chaleur des volcans ?", r: "GEOTHERMIE", h: "Puissance de la terre." },
+                { q: "Quel gaz est produit par la décomposition des déchets organiques ?", r: "METHANE", h: "CH4." },
+                { q: "Comment appelle-t-on la transformation des déchets en nouveaux produits ?", r: "RECYCLAGE", h: "Économie circulaire." },
+                { q: "Quelle unité mesure la consommation d'énergie sur une facture ?", r: "KWH", h: "Kilowatt-heure." },
+                { q: "Quel phénomène réchauffe l'atmosphère à cause du CO2 ?", r: "EFFET DE SERRE", h: "Comme sous une vitre." }
+            ],
+            "Informatique et Programmation": [
+                { q: "Quel langage permet d'ajouter de l'interactivité à une page web ?", r: "JAVASCRIPT", h: "JS." },
+                { q: "Quel composant est considéré comme le 'cerveau' de l'ordinateur ?", r: "PROCESSEUR", h: "CPU." },
+                { q: "Que signifie le sigle RAM ?", r: "MEMOIRE VIVE", h: "Mémoire à accès aléatoire." },
+                { q: "Quel serveur traduit un nom de domaine en adresse IP ?", r: "DNS", h: "Domain Name System." },
+                { q: "Comment appelle-t-on l'adresse unique d'une machine sur un réseau ?", r: "ADRESSE IP", h: "4 nombres séparés par des points." },
+                { q: "Quel système de numération n'utilise que des 0 et des 1 ?", r: "BINAIRE", h: "Base 2." },
+                { q: "Comment appelle-t-on une suite d'instructions qui se répète ?", r: "BOUCLE", h: "For ou While." },
+                { q: "Quel mot clé introduit une condition dans un programme ?", r: "SI", h: "If en anglais." },
+                { q: "Comment appelle-t-on une erreur dans un code informatique ?", r: "BUG", h: "Petit insecte en anglais." },
+                { q: "Quel logiciel traduit le code source en langage machine ?", r: "COMPILATEUR", h: "Étape avant l'exécution." },
+                { q: "Comment appelle-t-on un logiciel malveillant ?", r: "VIRUS", h: "Ou Malware." },
+                { q: "Quel protocole permet une navigation web sécurisée ?", r: "HTTPS", h: "Avec un S pour Secure." },
+                { q: "Comment appelle-t-on le stockage de données sur des serveurs distants ?", r: "CLOUD", h: "Le nuage." },
+                { q: "Quel sigle désigne l'Intelligence Artificielle ?", r: "IA", h: "AI en anglais." },
+                { q: "Quel objet physique permet de relier plusieurs ordinateurs en réseau ?", r: "SWITCH", h: "Ou commutateur." },
+                { q: "Quel langage est utilisé pour structurer le contenu d'une page web ?", r: "HTML", h: "HyperText Markup Language." },
+                { q: "Quel langage gère la mise en forme et le style d'un site ?", r: "CSS", h: "Cascading Style Sheets." },
+                { q: "Que signifie URL ?", r: "ADRESSE WEB", h: "Uniform Resource Locator." },
+                { q: "Quel petit fichier texte stocke vos préférences sur un site ?", r: "COOKIE", h: "Petit biscuit." },
+                { q: "Quel algorithme permet de sécuriser les messages par cryptage ?", r: "CHIFFREMENT", h: "Protège la vie privée." }
+            ]
         };
 
-        // Logo par défaut en base64 (remplacez par votre logo si nécessaire)
-        // Pour convertir votre logo : https://base64.guru/converter/encode/image
-        // Collez votre logo en base64 entre les guillemets ci-dessous :
-        const DEFAULT_LOGO_BASE64 = null; // "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+        // --- COMPOSANTS UI ---
+        const Icon = ({ name, className }) => {
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} className={className}></i>;
+        };
 
-        // ========================================
-        // VARIABLES GLOBALES
-        // ========================================
-        let currentUser = null;
-        let studentsList = [];
-
-        // ========================================
-        // INITIALISATION
-        // ========================================
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApplication();
-            setupEventListeners();
-        });
-
-        function initializeApplication() {
-            // Charger les données ou initialiser avec la configuration par défaut
-            loadData();
-            
-            // Appliquer la configuration initiale si c'est la première fois
-            if (!localStorage.getItem('appInitialized')) {
-                applyInitialConfiguration();
-                localStorage.setItem('appInitialized', 'true');
-            }
-            
-            // Mettre à jour l'affichage
-            updateDisplay();
-        }
-
-        function applyInitialConfiguration() {
-            // Appliquer le nom de l'établissement
-            if (INITIAL_CONFIG.schoolName && INITIAL_CONFIG.schoolName !== "Collège [NOM DE VOTRE ÉTABLISSEMENT]") {
-                localStorage.setItem('schoolName', INITIAL_CONFIG.schoolName);
-            }
-            
-            // Appliquer le logo par défaut
-            if (DEFAULT_LOGO_BASE64) {
-                localStorage.setItem('schoolLogo', DEFAULT_LOGO_BASE64);
-            }
-            
-            // Ajouter les élèves initiaux
-            const initialStudentsParsed = parseInitialStudents(INITIAL_CONFIG.initialStudents);
-            if (initialStudentsParsed.length > 0) {
-                studentsList = [...initialStudentsParsed];
-                localStorage.setItem('studentsList', JSON.stringify(studentsList));
-            }
-        }
-
-        function loadData() {
-            // Charger les données depuis localStorage
-            const savedStudents = localStorage.getItem('studentsList');
-            if (savedStudents) {
-                studentsList = JSON.parse(savedStudents);
-            }
-        }
-
-        function updateDisplay() {
-            // Mettre à jour le nom de l'établissement
-            const savedSchoolName = localStorage.getItem('schoolName');
-            if (savedSchoolName) {
-                document.getElementById('schoolTitle').textContent = savedSchoolName;
-            }
-
-            // Mettre à jour le logo
-            const savedLogo = localStorage.getItem('schoolLogo');
-            if (savedLogo) {
-                document.getElementById('logoContainer').innerHTML = '<img src="' + savedLogo + '" alt="Logo établissement" class="w-24 h-24 mx-auto rounded-full object-cover">';
-            }
-        }
-
-        function saveData() {
-            localStorage.setItem('studentsList', JSON.stringify(studentsList));
-        }
-
-
-        function setupEventListeners() {
-            // Formulaire de connexion élève
-            document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleStudentLogin();
-            });
-
-            // Formulaire de signalement
-            document.getElementById('reportForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleReport();
-            });
-        }
-
-        // Navigation
-        function showHome() {
-            hideAllPages();
-            document.getElementById('homePage').classList.remove('hidden');
-        }
-
-        function showStudentLogin() {
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
-        }
-
-        function hideAllPages() {
-            const pages = ['homePage', 'studentLoginPage', 'studentReportPage'];
-            pages.forEach(pageId => {
-                const page = document.getElementById(pageId);
-                if (page) {
-                    page.classList.add('hidden');
-                }
-            });
-        }
-
-        // Gestion des connexions
-        function handleStudentLogin() {
-            const studentId = document.getElementById('studentId').value.trim().toLowerCase();
-            const studentClass = document.getElementById('studentClass').value;
-            const tempPassword = document.getElementById('studentTempPassword').value.trim();
-
-            // Vérifier dans la liste des élèves avec le mot de passe provisoire (première connexion)
-            const student = studentsList.find(s => 
-                s.id.toLowerCase() === studentId && 
-                s.class === studentClass && 
-                s.tempPassword === tempPassword
+        const Timer = ({ time }) => {
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+            return (
+                <div className="font-orbitron text-2xl text-blue-400 neon-text">
+                    {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                </div>
             );
+        };
 
-            if (student && !student.password) {
-                // PREMIÈRE CONNEXION : Générer un nouveau mot de passe personnel
-                const newPassword = generatePassword();
-                student.password = newPassword;
-                
-                // Sauvegarder immédiatement dans localStorage
-                saveData();
-                
-                // Sauvegarder le mot de passe sur l'appareil de l'élève pour faciliter les connexions futures
-                const studentKey = 'student_' + studentId + '_' + studentClass;
-                localStorage.setItem(studentKey, newPassword);
-                
-                // Afficher le mot de passe dans une popup personnalisée
-                showPasswordModal(newPassword);
-                
-                currentUser = student;
-                
-            } else {
-                // Vérifier si l'élève essaie de se connecter avec son mot de passe personnel (connexions suivantes)
-                const studentWithPassword = studentsList.find(s => 
-                    s.id.toLowerCase() === studentId && 
-                    s.class === studentClass && 
-                    s.password === tempPassword
-                );
-                
-                if (studentWithPassword) {
-                    // Connexion réussie avec le mot de passe personnel
-                    currentUser = studentWithPassword;
-                    hideAllPages();
-                    document.getElementById('studentReportPage').classList.remove('hidden');
-                } else {
-                    // Identifiants incorrects
-                    alert('❌ CONNEXION ÉCHOUÉE\n\n' +
-                          'Vérifiez attentivement :\n' +
-                          '• Votre identifiant (format: nom.prenom)\n' +
-                          '• Votre classe\n' +
-                          '• Votre mot de passe\n\n' +
-                          '🔑 RAPPEL :\n' +
-                          '• PREMIÈRE connexion : utilisez le mot de passe provisoire\n' +
-                          '• Connexions suivantes : utilisez votre mot de passe personnel\n\n' +
-                          '❓ Si vous avez oublié votre mot de passe personnel, contactez le référent Phare.');
-                }
-            }
-        }
+        // --- APPLICATION PRINCIPALE ---
+        function App() {
+            const [step, setStep] = useState('home');
+            const [currentRoomIdx, setCurrentRoomIdx] = useState(0);
+            const [currentRiddleIdx, setCurrentRiddleIdx] = useState(0);
+            const [timeLeft, setTimeLeft] = useState(600);
+            const [userInput, setUserInput] = useState('');
+            const [showHint, setShowHint] = useState(false);
+            const [lockoutTime, setLockoutTime] = useState(null);
 
-        function parseInitialStudents(studentString) {
-            const students = [];
-            const lines = studentString.trim().split('\n');
-
-            lines.forEach(line => {
-                const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('//') || trimmedLine === '') {
-                    return; // Ignorer les commentaires et les lignes vides
-                }
-
-                const parts = trimmedLine.split(/\t+|\s{2,}/).map(part => part.trim());
-                if (parts.length === 3) {
-                    students.push({
-                        id: parts[0],
-                        class: parts[1],
-                        tempPassword: parts[2],
-                        password: null
-                    });
-                }
-            });
-            return students;
-        }
-
-        // Gestion des signalements
-        function handleReport() {
-            const role = document.querySelector('input[name="role"]:checked').value;
-            const location = document.getElementById('location').value;
-            const frequency = document.getElementById('frequency').value;
-            const description = document.getElementById('description').value;
-            const reportDate = new Date().toLocaleDateString('fr-FR');
-
-            // Préparer et envoyer l'email
-            const emails = INITIAL_CONFIG.referentEmails.filter(e => e && !e.startsWith('referent'));
-            if (emails.length > 0) {
-                const to = emails.join(',');
-                const subject = "Signalement Phare";
-                
-                const body = `
-Nouveau signalement reçu :
-
------------------------------------
-INFORMATIONS SUR LE SIGNALEMENT
------------------------------------
-- Signalé par : ${currentUser.id}
-- Classe : ${currentUser.class}
-- Rôle déclaré : ${role}
-- Date : ${reportDate}
-- Lieu des faits : ${location}
-- Fréquence : ${frequency}
-
------------------------------------
-DESCRIPTION DE LA SITUATION
------------------------------------
-${description}
-
------------------------------------
-Ceci est un message automatique généré par l'application Anti-Harcèlement.
-                `.trim();
-
-                const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailtoLink;
-            }
-
-            alert('Signalement envoyé ! Votre application d\'email va s\'ouvrir. N\'oubliez pas d\'appuyer sur \'Envoyer\'.');
-            document.getElementById('reportForm').reset();
-            studentLogout(); // Déconnexion après envoi
-        }
-
-        // Déconnexions
-        function studentLogout() {
-            currentUser = null;
-            showHome();
-        }
-
-        // Gestion de la popup de mot de passe
-        function showPasswordModal(password) {
-            document.getElementById('generatedPassword').textContent = password;
-            document.getElementById('passwordModal').classList.remove('hidden');
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').classList.add('hidden');
-            // currentUser est déjà défini dans handleStudentLogin
-            if (currentUser) {
-                hideAllPages();
-                document.getElementById('studentReportPage').classList.remove('hidden');
-            } else {
-                showHome();
-            }
-        }
-
-        function backToLogin() {
-            document.getElementById('passwordModal').classList.add('hidden');
-            currentUser = null;
-            // Réinitialiser le formulaire de connexion
-            document.getElementById('studentLoginForm').reset();
-            hideAllPages();
-            document.getElementById('studentLoginPage').classList.remove('hidden');
-        }
-
-        function copyPassword() {
-            const password = document.getElementById('generatedPassword').textContent;
-            
-            // Méthode moderne pour copier
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(password).then(() => {
-                    alert('✅ Mot de passe copié dans le presse-papiers !');
-                }).catch(() => {
-                    // Fallback si la copie échoue
-                    fallbackCopy(password);
+            const selectedRiddles = useMemo(() => {
+                const result = {};
+                Object.keys(BANQUE_ENIGMES).forEach(theme => {
+                    result[theme] = [...BANQUE_ENIGMES[theme]]
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 4);
                 });
-            } else {
-                // Fallback pour les navigateurs plus anciens
-                fallbackCopy(password);
+                return result;
+            }, []);
+
+            const themes = Object.keys(selectedRiddles);
+
+            useEffect(() => {
+                let timer;
+                if ((step === 'game' || step === 'room5') && timeLeft > 0) {
+                    timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+                } else if (timeLeft === 0 && (step === 'game' || step === 'room5')) {
+                    setStep('fail');
+                }
+                return () => clearInterval(timer);
+            }, [step, timeLeft]);
+
+            useEffect(() => {
+                const lastAttempt = localStorage.getItem('last_attempt_tech_escape');
+                if (lastAttempt) {
+                    const diff = Date.now() - parseInt(lastAttempt);
+                    if (diff < 3600000) {
+                        setLockoutTime(3600000 - diff);
+                        setStep('lockout');
+                    }
+                }
+            }, []);
+
+            const startGaming = () => {
+                localStorage.setItem('last_attempt_tech_escape', Date.now().toString());
+                setStep('game');
+                setTimeLeft(600);
+                setCurrentRoomIdx(0);
+                setCurrentRiddleIdx(0);
+            };
+
+            const handleAnswer = (e) => {
+                e.preventDefault();
+                const currentTheme = themes[currentRoomIdx];
+                const currentRiddle = selectedRiddles[currentTheme][currentRiddleIdx];
+
+                if (userInput.toUpperCase().trim() === currentRiddle.r.toUpperCase()) {
+                    if (currentRiddleIdx < 3) {
+                        setCurrentRiddleIdx(prev => prev + 1);
+                        setUserInput('');
+                        setShowHint(false);
+                    } else {
+                        if (currentRoomIdx < themes.length - 1) {
+                            setCurrentRoomIdx(prev => prev + 1);
+                            setCurrentRiddleIdx(0);
+                            setUserInput('');
+                            setShowHint(false);
+                            setTimeLeft(600);
+                        } else {
+                            setStep('room5');
+                            setTimeLeft(600);
+                        }
+                    }
+                } else {
+                    alert("Code incorrect ! Réessayez.");
+                }
+            };
+
+            if (step === 'lockout') {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-4">
+                        <div className="glass-panel p-8 rounded-2xl border-red-500/50 max-w-md text-center">
+                            <Icon name="lock" className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-orbitron mb-4">SYSTÈME VERROUILLÉ</h2>
+                            <p className="mb-6">Une tentative est déjà en cours. Pour éviter la triche, vous devez attendre 1 heure entre chaque essai.</p>
+                            <div className="text-xl font-mono text-red-400">
+                                Réessayez dans environ {Math.ceil(lockoutTime / 60000)} minutes.
+                            </div>
+                        </div>
+                    </div>
+                );
             }
+
+            if (step === 'home') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                        <div className="text-center mb-12">
+                            <h1 className="text-5xl md:text-7xl font-orbitron font-bold mb-4 neon-text text-blue-500">
+                                ESCAPE TECH
+                            </h1>
+                            <p className="text-xl text-blue-300 tracking-widest animate-pulse-slow font-medium">RÉVISION BREVET TECHNOLOGIE</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full">
+                            <button
+                                onClick={startGaming}
+                                className="glass-panel p-8 rounded-2xl hover:neon-border transition-all group"
+                            >
+                                <Icon name="play" className="w-12 h-12 mb-4 text-green-400 group-hover:scale-110 transition-transform" />
+                                <h2 className="text-2xl font-orbitron mb-2">DÉMARRER</h2>
+                                <p className="text-slate-400">Lancez l'aventure. 5 thèmes, 10 minutes par salle.</p>
+                            </button>
+
+                            <button
+                                onClick={() => setStep('guide')}
+                                className="glass-panel p-8 rounded-2xl hover:neon-border transition-all group"
+                            >
+                                <Icon name="settings" className="w-12 h-12 mb-4 text-blue-400 group-hover:rotate-90 transition-transform" />
+                                <h2 className="text-2xl font-orbitron mb-2">GUIDE / MODIF</h2>
+                                <p className="text-slate-400">Apprendre à modifier le jeu et les énigmes.</p>
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (step === 'guide') {
+                return (
+                    <div className="min-h-screen p-8 max-w-4xl mx-auto">
+                        <button onClick={() => setStep('home')} className="mb-8 flex items-center text-blue-400 hover:underline">
+                            <Icon name="arrow-left" className="mr-2 w-4 h-4" /> Retour
+                        </button>
+                        <div className="glass-panel p-8 rounded-2xl space-y-8">
+                            <h2 className="text-3xl font-orbitron text-blue-500">Guide de Modification</h2>
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold">1. Changer les questions</h3>
+                                <p>Cherchez la variable <code className="text-pink-400 font-bold">BANQUE_ENIGMES</code> dans le code source. Vous pouvez ajouter autant de questions que vous voulez dans chaque thème (actuellement 20 questions par thème pour plus de variété).</p>
+
+                                <h3 className="text-xl font-bold">2. Changer le temps</h3>
+                                <p>Modifiez la valeur de <code className="text-pink-400 font-bold">timeLeft</code> dans le code source (600 = 10 minutes).</p>
+
+                                <h3 className="text-xl font-bold">3. Personnaliser les thèmes</h3>
+                                <p>Vous pouvez changer les noms des thèmes et les icônes associées directement dans le code React.</p>
+                            </div>
+                            <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-500/30">
+                                <p className="text-sm italic">Note : Ce jeu est conçu pour être distribué comme un seul fichier HTML. Idéal pour les clés USB ou les ENT.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (step === 'game') {
+                const currentTheme = themes[currentRoomIdx];
+                const currentRiddle = selectedRiddles[currentTheme][currentRiddleIdx];
+                const icons = ["microscope", "anvil", "zap", "cpu"];
+
+                return (
+                    <div className="min-h-screen p-4 flex flex-col items-center">
+                        <div className="w-full max-w-4xl glass-panel p-6 rounded-2xl mb-8 flex justify-between items-center">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-3 bg-blue-500/20 rounded-lg">
+                                    <Icon name={icons[currentRoomIdx]} className="text-blue-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-orbitron uppercase tracking-wider">{currentTheme}</h2>
+                                    <p className="text-sm text-slate-400">Énigme {currentRiddleIdx + 1} / 4</p>
+                                </div>
+                            </div>
+                            <Timer time={timeLeft} />
+                        </div>
+
+                        <div className="w-full max-w-3xl glass-panel p-12 rounded-3xl neon-border relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                                <Icon name="shield" className="w-32 h-32" />
+                            </div>
+
+                            <span className="text-xs font-orbitron text-blue-500 tracking-widest uppercase mb-4 block opacity-70">Identification Requise</span>
+                            <h3 className="text-2xl md:text-3xl font-medium mb-8 leading-relaxed">
+                                {currentRiddle.q}
+                            </h3>
+
+                            <form onSubmit={handleAnswer} className="space-y-6">
+                                <input
+                                    type="text"
+                                    value={userInput}
+                                    onChange={(e) => setUserInput(e.target.value)}
+                                    placeholder="Réponse..."
+                                    className="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-xl focus:outline-none focus:border-blue-500 text-xl font-mono uppercase tracking-widest"
+                                    autoFocus
+                                />
+                                <div className="flex space-x-4">
+                                    <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20">
+                                        VALIDER
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowHint(true)}
+                                        className="p-4 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors group"
+                                    >
+                                        <Icon name="lightbulb" className={showHint ? "text-yellow-400" : "text-slate-500 group-hover:text-yellow-400"} />
+                                    </button>
+                                </div>
+                            </form>
+
+                            {showHint && (
+                                <div className="mt-6 p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg text-yellow-200 animate-pulse font-medium">
+                                    <span className="text-yellow-500 font-bold mr-2">INDICE :</span> {currentRiddle.h}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            if (step === 'room5') {
+                return (
+                    <div className="min-h-screen p-4 flex flex-col items-center">
+                        <div className="w-full max-w-4xl glass-panel p-6 rounded-2xl mb-8 flex justify-between items-center border-purple-500/50">
+                            <div className="flex items-center space-x-4">
+                                <div className="p-3 bg-purple-500/20 rounded-lg">
+                                    <Icon name="binary" className="text-purple-500" />
+                                </div>
+                                <h2 className="text-xl font-orbitron uppercase tracking-wider">Histoire du Codage</h2>
+                            </div>
+                            <Timer time={timeLeft} />
+                        </div>
+
+                        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="glass-panel p-6 rounded-2xl">
+                                <h3 className="text-xl font-orbitron text-purple-400 mb-6">Bibliothèque du Chiffrement</h3>
+                                <div className="space-y-4 text-sm">
+                                    <div className="p-4 bg-slate-900/50 rounded border-l-4 border-purple-500">
+                                        <strong className="block text-purple-300 mb-1 font-orbitron">Scytale :</strong> Bâton autour duquel on enroule un ruban de cuir pour lire le message.
+                                    </div>
+                                    <div className="p-4 bg-slate-900/50 rounded border-l-4 border-purple-500">
+                                        <strong className="block text-purple-300 mb-1 font-orbitron">César :</strong> Décalage de lettres (ex: décalage de +1, A devient B).
+                                    </div>
+                                    <div className="p-4 bg-slate-900/50 rounded border-l-4 border-purple-500">
+                                        <strong className="block text-purple-300 mb-1 font-orbitron">Atbash :</strong> Alphabet inversé (A devient Z, B devient Y).
+                                    </div>
+                                    <div className="p-4 bg-slate-900/50 rounded border-l-4 border-purple-500">
+                                        <strong className="block text-purple-300 mb-1 font-orbitron">Pigpen :</strong> Utilisation de symboles géométriques (Franc-Maçon).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center text-center">
+                                <Icon name="terminal" className="w-16 h-16 text-purple-500 mb-6" />
+                                <h3 className="text-2xl font-orbitron mb-4">DÉCRYPTAGE FINAL</h3>
+                                <p className="mb-8 text-slate-300 italic">"Le code secret a été chiffré par César avec un décalage de +1."</p>
+                                <div className="bg-slate-900 p-6 rounded-lg font-mono text-3xl tracking-[1rem] mb-8 text-purple-400 shadow-inner border border-purple-500/20">
+                                    CSFWFU
+                                </div>
+                                <div className="w-full">
+                                    <input
+                                        type="text"
+                                        placeholder="MOT DÉCRYPTÉ"
+                                        className="w-full bg-slate-800 border border-purple-500/50 p-4 rounded-xl text-center font-mono uppercase tracking-widest focus:border-purple-400 focus:outline-none transition-colors"
+                                        onChange={(e) => {
+                                            if (e.target.value.toUpperCase().trim() === "BREVET") {
+                                                setStep('victory');
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (step === 'victory') {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-4 text-center">
+                        <div className="max-w-2xl animate-in fade-in zoom-in duration-700">
+                            <Icon name="trophy" className="w-32 h-32 text-yellow-400 mx-auto mb-8 animate-bounce" />
+                            <h1 className="text-6xl font-orbitron font-bold text-white mb-4 neon-text">VICTOIRE !</h1>
+                            <p className="text-2xl text-blue-300 mb-12">Vous avez piraté le système et validé vos connaissances technologiques.</p>
+                            <div className="glass-panel p-8 rounded-2xl border-green-500/30">
+                                <p className="text-slate-400 mb-2 uppercase tracking-widest text-sm">Score d'Efficacité</p>
+                                <div className="text-5xl font-orbitron text-green-400 mb-8">{Math.floor(timeLeft / 10)}%</div>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-12 py-4 bg-blue-600 rounded-full font-bold hover:bg-blue-500 transition-all transform hover:scale-105 shadow-xl shadow-blue-500/30"
+                                >
+                                    TERMINER
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (step === 'fail') {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-4 text-center">
+                        <div className="animate-in fade-in duration-500">
+                            <Icon name="skull" className="w-32 h-32 text-red-500 mx-auto mb-8" />
+                            <h1 className="text-6xl font-orbitron font-bold text-white mb-4">ÉCHEC</h1>
+                            <p className="text-2xl text-slate-400 mb-12">Le système s'est auto-détruit. Temps écoulé.</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-12 py-4 bg-red-600 rounded-full font-bold hover:bg-red-500 transition-all"
+                            >
+                                QUITTER
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return null;
         }
 
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                alert('✅ Mot de passe copié dans le presse-papiers !');
-            } catch (err) {
-                alert('❌ Impossible de copier automatiquement. Sélectionnez et copiez manuellement le mot de passe.');
-            }
-            
-            document.body.removeChild(textArea);
-        }
-
-        // Utilitaires
-        function generatePassword() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let password = '';
-            for (let i = 0; i < 8; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return password;
-        }
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97282c92b7112a19',t:'MTc1NTc1ODc5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
