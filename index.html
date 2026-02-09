@@ -561,10 +561,10 @@
                         <div class="question" id="qbox-${i}-${idx}">
                             <p style="margin-top:0;"><strong>DÉFI ${idx+1} :</strong> ${q.q}</p>
 
-                            <button class="btn btn-secondary" style="margin-bottom: 15px;" onclick="toggleHint(${i}, ${idx})">
-                                <i class="fas fa-lightbulb"></i> Voir l'indice
+                            <button class="btn btn-primary" style="margin-bottom: 15px; background: linear-gradient(135deg, var(--accent), var(--secondary));" onclick="toggleHint(${i}, ${idx})">
+                                <i class="fas fa-lightbulb"></i> INDICE
                             </button>
-                            <div id="hint-${i}-${idx}" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(129, 140, 248, 0.1); border-left: 4px solid var(--accent); border-radius: 8px; font-size: 0.9em; color: var(--text-main);">
+                            <div id="hint-${i}-${idx}" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(15, 23, 42, 0.6); border: 2px solid var(--accent); border-radius: 12px; color: var(--text-main); font-style: italic;">
                                 <i class="fas fa-info-circle" style="color: var(--accent); margin-right: 8px;"></i>
                                 <span>${q.h}</span>
                             </div>
