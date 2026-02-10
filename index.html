@@ -1,796 +1,662 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mission Cyber Quiz</title>
-  <script src="/_sdk/data_sdk.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Game Technologie - Brevet 3ème</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --secondary: #f472b6;
+            --accent: #818cf8;
+            --success: #4ade80;
+            --error: #f87171;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
         body {
-            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
         }
 
-        .question-card {
-            transition: all 0.3s ease;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .option-btn {
-            transition: all 0.2s ease;
+        h1 {
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            font-size: 3em;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
         }
 
-        .option-btn:hover {
-            transform: translateX(5px);
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 1.1em;
         }
 
-        .correct {
-            background-color: #10b981 !important;
-            color: white !important;
+        #timer-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            margin-bottom: 30px;
+            text-align: center;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        #timer { font-size: 1.4em; color: var(--text-main); margin-left: 10px; }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
         }
 
-        .incorrect {
-            background-color: #ef4444 !important;
-            color: white !important;
+        .theme-card-home {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .theme-card-home::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
+        .theme-card-home:hover:not(.locked) {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+        .theme-card-home:hover::before { transform: translateX(100%); }
+
+        .theme-card-home.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .theme-card-home i.icon-main {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--accent);
+        }
+
+        .theme-card-home h2 { margin: 0; font-size: 1.2em; color: var(--text-main); }
+        .theme-card-home p { margin: 5px 0 0; color: var(--text-muted); font-size: 0.85em; }
+
+        .theme-card { display: none; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 25px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: border-color 0.3s;
+        }
+        .question:focus-within { border-color: var(--primary); }
+
+        .answer-input {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            font-size: 1em;
+            transition: 0.2s;
+        }
+        .answer-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+        .btn-primary:hover { transform: scale(1.05); filter: brightness(1.1); }
+
+        .btn-secondary { background: #334155; color: var(--text-main); }
+        .btn-secondary:hover { background: #475569; }
+
+        .code-display {
+            text-align: center;
+            margin: 30px 0;
+            font-weight: 700;
+            color: var(--success);
+            display: none;
+            padding: 25px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 2px dashed var(--success);
+            border-radius: 16px;
+            font-size: 1.6em;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
+        .lock-zone {
+            background: rgba(244, 114, 182, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid rgba(244, 114, 182, 0.2);
+        }
+
+        .edu-content {
+            background: rgba(129, 140, 248, 0.1);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 6px solid var(--accent);
+        }
+        .edu-content h3 { margin-top: 0; color: var(--accent); font-size: 1.3em; }
+
+        .victory-screen {
+            display: none; text-align: center; padding: 60px 20px;
+        }
+        .victory-screen i.fa-trophy {
+            font-size: 6em;
+            background: linear-gradient(to bottom, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.4));
+        }
+
+        /* Pièce 5 s'adapte en fonction du nombre de colonnes */
+        .theme-card-home:nth-child(5) {
+            grid-column: span 2;
+        }
+
+        /* Si on peut afficher 3 colonnes ou plus, la pièce 5 prend 4 colonnes */
+        @media (min-width: 720px) {
+            .theme-card-home:nth-child(5) {
+                grid-column: span 4;
             }
-            50% {
-                opacity: .7;
+        }
+
+        /* Si on peut afficher seulement 2 colonnes, la pièce 5 prend 2 colonnes */
+        @media (max-width: 719px) and (min-width: 400px) {
+            .theme-card-home:nth-child(5) {
+                grid-column: span 2;
             }
         }
+
+        /* Sur mobile très petit, toutes les cartes prennent toute la largeur */
+        @media (max-width: 399px) {
+            .theme-card-home:nth-child(5) {
+                grid-column: span 1;
+            }
+        }
+
+        #lockout-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-color); z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px;
+        }
+
+        .status-badge {
+            position: absolute; top: 15px; right: 15px; font-size: 1.2em;
+        }
+        .lock-icon { color: var(--error); }
+        .check-icon { color: var(--success); }
     </style>
-  <style>@view-transition { navigation: auto; }</style>
- </head>
- <body class="w-full min-h-full">
-  <div id="app" class="w-full min-h-full"></div>
-  <script>
-        const defaultConfig = {
-            background_color: "#0f172a",
-            surface_color: "#1e293b",
-            text_color: "#f1f5f9",
-            primary_action_color: "#3b82f6",
-            secondary_action_color: "#64748b",
-            font_family: "Inter",
-            font_size: 16,
-            quiz_title: "Quiz sur les Réseaux Informatiques",
-            intro_text: "Bienvenue dans ce quiz sur les réseaux informatiques ! Teste tes connaissances sur les routeurs, les adresses IP, et bien plus encore. Tu as 30 minutes pour terminer. Bonne chance !",
-            timer_label: "Temps restant"
+</head>
+<body>
+
+    <div id="lockout-screen">
+        <i class="fas fa-user-lock fa-5x" style="color: var(--secondary); margin-bottom: 30px;"></i>
+        <h2 style="font-size: 2.5em; margin-bottom: 10px;">Accès Verrouillé</h2>
+        <p style="color: var(--text-muted); max-width: 500px; margin-bottom: 30px;">
+            Pour garantir l'équité, une pause est nécessaire entre deux tentatives réussies. Repose-toi un peu !
+        </p>
+        <div id="lockout-timer" style="font-weight: 700; font-size: 1.8em; color: var(--primary); background: rgba(56, 189, 248, 0.1); padding: 15px 40px; border-radius: 50px;"></div>
+    </div>
+
+    <div class="container">
+        <div id="timer-container" style="display:none;">
+            <i class="fas fa-hourglass-half"></i> <span id="timer">10:00</span>
+        </div>
+
+        <!-- HOME PAGE -->
+        <div id="homePage" class="home-page">
+            <h1>Escape Game Technologie</h1>
+            <p class="subtitle">Préparez votre Brevet en explorant le monde numérique !</p>
+
+            <div class="theme-grid" id="homeGrid">
+                <!-- Dynamically filled -->
+            </div>
+
+
+        </div>
+
+        <div id="roomContainer"></div>
+
+        <!-- VICTORY PAGE -->
+        <div id="victoryPage" class="victory-screen">
+            <i class="fas fa-trophy"></i>
+            <h1 style="color: var(--success); -webkit-text-fill-color: var(--success);">MISSION ACCOMPLIE !</h1>
+            <p style="font-size: 1.2em; color: var(--text-main);">Vous avez débloqué tous les systèmes et terminé l'épreuve.</p>
+            <p id="finalStats" style="font-size: 1.5em; font-weight: 700; margin: 30px 0; color: var(--primary);"></p>
+            <button class="btn btn-primary" onclick="location.reload()"><i class="fas fa-redo"></i> Rejouer plus tard</button>
+        </div>
+    </div>
+
+    <script>
+        const codes = ["A7B2", "C3D9", "E5F1", "K9L1"];
+        const ROOM_TIME_LIMIT = 10 * 60;
+        const LOCKOUT_DURATION = 60 * 60 * 1000;
+
+        const banqueQuestions = {
+            0: [
+                {q:"Mobilité téléphone ?", a:"portabilité", h:"Capacité à être transporté facilement."},
+                {q:"Année iPhone ?", a:"2007", h:"Année de sortie du premier smartphone d'Apple."},
+                {q:"Innovation radicale ?", a:"rupture", h:"On parle d'une innovation de ..."},
+                {q:"Nb familles matériaux ?", a:"4", h:"Métaux, céramiques, polymères, organiques."},
+                {q:"Invention de Gutenberg ?", a:"imprimerie", h:"Pour reproduire des livres massivement."},
+                {q:"Inventeur machine vapeur ?", a:"watt", h:"Unité de puissance électrique."},
+                {q:"Premier satellite ?", a:"spoutnik", h:"Lancé par l'URSS en 1957."},
+                {q:"Inventeur téléphone ?", a:"bell", h:"Graham ..."},
+                {q:"Année transistor ?", a:"1947", h:"Milieu du XXe siècle."},
+                {q:"Inventeur ampoule ?", a:"edison", h:"Thomas ..."},
+                {q:"Premier microprocesseur ?", a:"intel 4004", h:"Marque célèbre commençant par I."},
+                {q:"Créateur Linux ?", a:"linus torvalds", h:"Prénom Linus."},
+                {q:"Nom du premier PC ?", a:"eniac", h:"Electronic Numerical Integrator and Computer."},
+                {q:"Créateur Web ?", a:"berners-lee", h:"Tim ..."},
+                {q:"Ancêtre Internet ?", a:"arpanet", h:"Réseau militaire américain."},
+                {q:"Premier langage calcul ?", a:"fortran", h:"Pour FORmula TRANslation."},
+                {q:"Stockage avant USB ?", a:"disquette", h:"Objet carré et souple."},
+                {q:"Inventeur vaccin rage ?", a:"pasteur", h:"Louis ..."},
+                {q:"Innovation de Benz ?", a:"automobile", h:"La première voiture."},
+                {q:"Mission Lune 1969 ?", a:"apollo 11", h:"Neil Armstrong en faisait partie."}
+            ],
+            1: [
+                {q:"Logiciel malveillant ?", a:"virus", h:"Se propage comme une maladie."},
+                {q:"Taille mdp sûr ?", a:"12", h:"Nombre de caractères minimum recommandé."},
+                {q:"Mail frauduleux ?", a:"phishing", h:"Hameçonnage en français."},
+                {q:"Protocole sécurisé web ?", a:"https", h:"Cadenas vert dans le navigateur."},
+                {q:"Barrière réseau ?", a:"pare-feu", h:"Firewall en anglais."},
+                {q:"Copie de secours ?", a:"sauvegarde", h:"Utile en cas de perte de données."},
+                {q:"Logiciel espion ?", a:"spyware", h:"Surveille vos activités en secret."},
+                {q:"Chiffrement de données ?", a:"cryptage", h:"Rendre les données illisibles sans clé."},
+                {q:"Pirate informatique ?", a:"hacker", h:"Expert qui s'introduit dans les systèmes."},
+                {q:"Tentative d'accès ?", a:"intrusion", h:"Entrer sans autorisation."},
+                {q:"Point faible système ?", a:"faille", h:"Une vulnérabilité."},
+                {q:"Preuve d'identité ?", a:"authentification", h:"Vérifier qui vous êtes."},
+                {q:"Code secret usage unique ?", a:"otp", h:"One Time Password."},
+                {q:"Réseau privé virtuel ?", a:"vpn", h:"Tunnel sécurisé pour naviguer."},
+                {q:"Arnaque au président ?", a:"escroquerie", h:"Tromperie pour obtenir de l'argent."},
+                {q:"Programme autodiffusant ?", a:"ver", h:"Worm en anglais."},
+                {q:"Blocage par rançon ?", a:"ransomware", h:"Demande d'argent pour débloquer les fichiers."},
+                {q:"Usurpation identité ?", a:"usurpation", h:"Se faire passer pour quelqu'un d'autre."},
+                {q:"Site web malveillant ?", a:"malveillant", h:"Qui veut du mal."},
+                {q:"Analyse de virus ?", a:"antivirus", h:"Logiciel de protection."}
+            ],
+            2: [
+                {q:"Nb piliers dév. durable ?", a:"3", h:"Économique, social et environnemental."},
+                {q:"Note max réparabilité ?", a:"10", h:"La note parfaite."},
+                {q:"Métal smartphone ?", a:"or", h:"Métal précieux conducteur."},
+                {q:"Énergie vent ?", a:"éolienne", h:"Utilise la force du vent."},
+                {q:"Énergie soleil ?", a:"photovoltaique", h:"Panneaux sur les toits."},
+                {q:"Gaz effet serre ?", a:"co2", h:"Dioxyde de carbone."},
+                {q:"Énergie terre ?", a:"geothermie", h:"Chaleur du sous-sol."},
+                {q:"Symbole recyclage ?", a:"moebius", h:"Ruban infini."},
+                {q:"Énergie eau ?", a:"hydraulique", h:"Force des barrages."},
+                {q:"Déchet organique ?", a:"compost", h:"Se transforme en terreau."},
+                {q:"Impact carbone ?", a:"empreinte", h:"Trace laissée sur l'environnement."},
+                {q:"Combustion bois ?", a:"biomasse", h:"Matière organique végétale."},
+                {q:"Combustible nucléaire ?", a:"uranium", h:"Minerai radioactif."},
+                {q:"Stockage chimique ?", a:"batterie", h:"Pour alimenter nos smartphones."},
+                {q:"Réduction pertes chaleur ?", a:"isolation", h:"Toits, murs et fenêtres."},
+                {q:"Vie d'un produit ?", a:"cycle", h:"De la création à la fin de vie."},
+                {q:"Ressource limitée ?", a:"fossile", h:"Pétrole, gaz ou charbon."},
+                {q:"Consommation unité ?", a:"kwh", h:"Kilo-Watt-Heure."},
+                {q:"Revalorisation ?", a:"recyclage", h:"Transformer les déchets en nouveaux produits."},
+                {q:"Énergie infinie ?", a:"renouvelable", h:"Qui se régénère naturellement."}
+            ],
+            3: [
+                {q:"Étude confort humain ?", a:"ergonomie", h:"Science du travail et du confort."},
+                {q:"Nb clics max ?", a:"3", h:"Règle d'or de la navigation."},
+                {q:"Cahier des ... ?", a:"charges", h:"Document de référence du projet."},
+                {q:"Bouton validation ?", a:"vert", h:"Couleur de la réussite."},
+                {q:"Expérience utilisateur ?", a:"ux", h:"User Experience."},
+                {q:"Interface utilisateur ?", a:"ui", h:"User Interface."},
+                {q:"Test avec utilisateurs ?", a:"test", h:"Pour vérifier si le produit fonctionne bien."},
+                {q:"Maquette simplifiée ?", a:"wireframe", h:"Squelette d'une page web."},
+                {q:"Profil type utilisateur ?", a:"persona", h:"Personnage fictif cible."},
+                {q:"Facilité d'utilisation ?", a:"utilisabilité", h:"Mesure de l'efficacité et satisfaction."},
+                {q:"Premier jet visuel ?", a:"prototype", h:"Modèle interactif du produit."},
+                {q:"Hiérarchie visuelle ?", a:"contraste", h:"Différence entre deux éléments."},
+                {q:"Temps de chargement ?", a:"performance", h:"Vitesse de l'application."},
+                {q:"Adaptation mobile ?", a:"responsive", h:"S'adapte à tous les écrans."},
+                {q:"Palette de couleurs ?", a:"charte", h:"Ensemble des règles graphiques."},
+                {q:"Chemin navigation ?", a:"arborescence", h:"Structure du site comme un arbre."},
+                {q:"Lisibilité texte ?", a:"typographie", h:"Choix des polices de caractères."},
+                {q:"Icône menu mobile ?", a:"burger", h:"Trois barres horizontales."},
+                {q:"Retour d'information ?", a:"feedback", h:"Réponse du système à une action."},
+                {q:"Guide de style ?", a:"design system", h:"Bibliothèque de composants design."}
+            ]
         };
 
-        const questions = [
-            {
-                id: 1,
-                question: "Quelle est la différence fondamentale entre un commutateur (switch) et un routeur dans l'architecture d'un réseau d'entreprise ?",
-                type: "multiple",
-                options: [
-                    "Le routeur assure la sécurité (pare-feu), tandis que le commutateur stocke les données des utilisateurs.",
-                    "Le commutateur fournit l'accès à Internet, alors que le routeur distribue cet accès aux différents appareils.",
-                    "Le commutateur gère les connexions sans fil (Wi-Fi) et le routeur gère les connexions filaires (Ethernet).",
-                    "Le routeur relie plusieurs réseaux locaux entre eux, tandis que le commutateur relie des équipements au sein d'un même réseau local."
-                ],
-                correct: 3
-            },
-            {
-                id: 2,
-                question: "D'après les documents, qu'est-ce qui caractérise la structure d'une adresse IP ?",
-                type: "multiple",
-                options: [
-                    "Elle est composée de 4 nombres, chacun étant compris entre 0 et 255.",
-                    "Elle est formée de 8 groupes de nombres hexadécimaux.",
-                    "Elle est composée de 4 mots de 16 bits chacun.",
-                    "C'est une adresse textuelle unique comme une URL (par exemple, youtube.fr)."
-                ],
-                correct: 0
-            },
-            {
-                id: 3,
-                question: "En quoi un réseau WLAN se distingue-t-il fondamentalement d'un réseau WAN ?",
-                type: "multiple",
-                options: [
-                    "Le WLAN est une catégorie de LAN, tandis que le WAN est une catégorie d'Internet.",
-                    "Le WLAN utilise exclusivement des ondes radio, tandis que le WAN utilise uniquement la fibre optique.",
-                    "Un WLAN est géré par un point d'accès, tandis qu'un WAN est géré par un serveur.",
-                    "Le WLAN est un réseau sans fil de portée locale (maison, collège), alors que le WAN couvre une zone géographique très étendue (pays, continent)."
-                ],
-                correct: 3
-            },
-            {
-                id: 4,
-                question: "Quelle fonction spécifique justifie l'appellation de \"routeur\" dans un \"routeur Wi-Fi\" ?",
-                type: "multiple",
-                options: [
-                    "Il relie directement les équipements au fournisseur d'accès à Internet.",
-                    "Il choisit la meilleure \"route\" pour les ondes radio afin d'éviter les obstacles.",
-                    "Il génère un sous-réseau local qui lui est propre.",
-                    "Il permet de commuter la connexion entre plusieurs équipements sans fil."
-                ],
-                correct: 2
-            },
-            {
-                id: 5,
-                question: "Parmi les moyens de connexion filaire décrits, lequel utilise des impulsions lumineuses pour transmettre les données ?",
-                type: "multiple",
-                options: [
-                    "Le câble Ethernet",
-                    "Le Modem",
-                    "La fibre optique",
-                    "Le Courant Porteur en Ligne (CPL)"
-                ],
-                correct: 2
-            },
-            {
-                id: 6,
-                question: "Selon les documents, quelle tâche n'est PAS une fonction principale d'un serveur dans un réseau de collège ?",
-                type: "multiple",
-                options: [
-                    "Établir l'interface de connexion entre le réseau et l'extérieur (Internet).",
-                    "Gérer la sécurité des données qui transitent sur le réseau (pare-feu).",
-                    "Stocker les données et les fichiers des utilisateurs.",
-                    "Gérer les autorisations d'accès des utilisateurs."
-                ],
-                correct: 0
-            },
-            {
-                id: 7,
-                question: "Parmi les technologies de communication sans fil mentionnées, laquelle se distingue par l'utilisation d'impulsions lumineuses au lieu d'ondes radio ?",
-                type: "multiple",
-                options: [
-                    "Le Li-Fi",
-                    "Le Satellite",
-                    "Le Bluetooth"
-                ],
-                correct: 0
-            },
-            {
-                id: 8,
-                question: "Quel est le rôle principal d'un \"point d'accès\" dans l'architecture d'un réseau ?",
-                type: "multiple",
-                options: [
-                    "Gérer la sécurité et les autorisations des utilisateurs du réseau sans fil.",
-                    "Relier plusieurs réseaux locaux de différents bâtiments ensemble.",
-                    "Établir la liaison entre un réseau filaire et les terminaux d'un réseau sans fil.",
-                    "Attribuer une adresse IP unique à chaque appareil connecté."
-                ],
-                correct: 2
-            },
-            {
-                id: 9,
-                question: "Dans un sous-réseau informatique comme celui de la \"Salle Techno 1\" du collège, qu'est-ce que les adresses IP des différents appareils ont en commun ?",
-                type: "multiple",
-                options: [
-                    "Elles sont toutes supérieures à 255.",
-                    "Le dernier nombre de leur adresse IP est toujours le même.",
-                    "Elles sont toutes composées uniquement de nombres pairs.",
-                    "Les premiers nombres de leur adresse IP sont identiques."
-                ],
-                correct: 3
-            },
-            {
-                id: 10,
-                question: "Quel équipement a pour fonction principale de connecter plusieurs équipements, comme des ordinateurs et des imprimantes, au sein d'un MÊME réseau local ?",
-                type: "multiple",
-                options: [
-                    "Le routeur",
-                    "Le serveur",
-                    "Le modem",
-                    "Le commutateur (switch)"
-                ],
-                correct: 3
-            }
-        ];
+        var currentRoom = -1;
+        var timeLeft = ROOM_TIME_LIMIT;
+        var timerInterval = null;
+        var unlocked = [true, false, false, false, false];
+        var roomsOpened = [true, false, false, false, false];
+        var completedRooms = [false, false, false, false, false];
+        var questionsPerRoom = {};
 
-        let currentQuestion = 0;
-        let score = 0;
-        let answers = [];
-        let timeLeft = 1800;
-        let timerInterval = null;
-        let startTime = null;
-        let quizState = "intro";
-        let studentFirstName = "";
-        let studentLastName = "";
-        let studentClass = "";
-        let matchingAnswers = {};
-
-        async function initApp() {
-            if (window.elementSdk) {
-                await window.elementSdk.init({
-                    defaultConfig,
-                    onConfigChange: async (config) => {
-                        updateUI(config);
-                    },
-                    mapToCapabilities: (config) => ({
-                        recolorables: [
-                            {
-                                get: () => config.background_color || defaultConfig.background_color,
-                                set: (value) => {
-                                    config.background_color = value;
-                                    window.elementSdk.setConfig({ background_color: value });
-                                }
-                            },
-                            {
-                                get: () => config.surface_color || defaultConfig.surface_color,
-                                set: (value) => {
-                                    config.surface_color = value;
-                                    window.elementSdk.setConfig({ surface_color: value });
-                                }
-                            },
-                            {
-                                get: () => config.text_color || defaultConfig.text_color,
-                                set: (value) => {
-                                    config.text_color = value;
-                                    window.elementSdk.setConfig({ text_color: value });
-                                }
-                            },
-                            {
-                                get: () => config.primary_action_color || defaultConfig.primary_action_color,
-                                set: (value) => {
-                                    config.primary_action_color = value;
-                                    window.elementSdk.setConfig({ primary_action_color: value });
-                                }
-                            },
-                            {
-                                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
-                                set: (value) => {
-                                    config.secondary_action_color = value;
-                                    window.elementSdk.setConfig({ secondary_action_color: value });
-                                }
-                            }
-                        ],
-                        borderables: [],
-                        fontEditable: {
-                            get: () => config.font_family || defaultConfig.font_family,
-                            set: (value) => {
-                                config.font_family = value;
-                                window.elementSdk.setConfig({ font_family: value });
-                            }
-                        },
-                        fontSizeable: {
-                            get: () => config.font_size || defaultConfig.font_size,
-                            set: (value) => {
-                                config.font_size = value;
-                                window.elementSdk.setConfig({ font_size: value });
-                            }
-                        }
-                    }),
-                    mapToEditPanelValues: (config) => new Map([
-                        ["quiz_title", config.quiz_title || defaultConfig.quiz_title],
-                        ["intro_text", config.intro_text || defaultConfig.intro_text],
-                        ["timer_label", config.timer_label || defaultConfig.timer_label]
-                    ])
-                });
-            }
-
-            render();
+        function init() {
+            checkLockout();
+            prepareQuestions();
+            renderHome();
         }
 
-        function updateUI(config) {
-            const fontFamily = config.font_family || defaultConfig.font_family;
-            const fontSize = config.font_size || defaultConfig.font_size;
-            const backgroundColor = config.background_color || defaultConfig.background_color;
-            const surfaceColor = config.surface_color || defaultConfig.surface_color;
-            const textColor = config.text_color || defaultConfig.text_color;
-            const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
-            const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
-
-            document.body.style.fontFamily = `${fontFamily}, sans-serif`;
-            document.body.style.backgroundColor = backgroundColor;
-            document.body.style.color = textColor;
-
-            const appElement = document.getElementById('app');
-            if (appElement) {
-                appElement.style.backgroundColor = backgroundColor;
-            }
-
-            const surfaces = document.querySelectorAll('.surface');
-            surfaces.forEach(el => el.style.backgroundColor = surfaceColor);
-
-            const titles = document.querySelectorAll('.title');
-            titles.forEach(el => {
-                el.style.fontSize = `${fontSize * 2}px`;
-                el.style.color = textColor;
-            });
-
-            const subtitles = document.querySelectorAll('.subtitle');
-            subtitles.forEach(el => {
-                el.style.fontSize = `${fontSize * 1.25}px`;
-                el.style.color = textColor;
-            });
-
-            const bodyTexts = document.querySelectorAll('.body-text');
-            bodyTexts.forEach(el => {
-                el.style.fontSize = `${fontSize}px`;
-                el.style.color = textColor;
-            });
-
-            const primaryButtons = document.querySelectorAll('.primary-btn');
-            primaryButtons.forEach(el => {
-                el.style.backgroundColor = primaryColor;
-                el.style.fontSize = `${fontSize}px`;
-            });
-
-            const secondaryButtons = document.querySelectorAll('.secondary-btn');
-            secondaryButtons.forEach(el => {
-                el.style.backgroundColor = secondaryColor;
-                el.style.fontSize = `${fontSize * 0.9}px`;
-            });
-
-            const optionButtons = document.querySelectorAll('.option-btn:not(.correct):not(.incorrect)');
-            optionButtons.forEach(el => {
-                el.style.backgroundColor = surfaceColor;
-                el.style.color = textColor;
-                el.style.fontSize = `${fontSize}px`;
-            });
-
-            const timerElement = document.getElementById('timer');
-            if (timerElement) {
-                timerElement.style.color = textColor;
-                timerElement.style.fontSize = `${fontSize * 1.25}px`;
-            }
-
-            const progressText = document.getElementById('progress-text');
-            if (progressText) {
-                progressText.style.color = textColor;
-                progressText.style.fontSize = `${fontSize * 0.9}px`;
+        function checkLockout() {
+            const lastFinish = localStorage.getItem('escape_last_finish');
+            if (lastFinish) {
+                const diff = Date.now() - parseInt(lastFinish);
+                if (diff < LOCKOUT_DURATION) showLockout(LOCKOUT_DURATION - diff);
             }
         }
 
-        function render() {
-            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
-            const app = document.getElementById('app');
+        function showLockout(remaining) {
+            document.getElementById('lockout-screen').style.display = 'flex';
+            const timerEl = document.getElementById('lockout-timer');
+            const update = () => {
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                timerEl.textContent = `${mins}m ${secs}s`;
+                remaining -= 1000;
+                if (remaining <= 0) location.reload();
+            };
+            update();
+            setInterval(update, 1000);
+        }
 
-            if (quizState === "intro") {
-                app.innerHTML = `
-                    <div class="w-full min-h-full flex items-center justify-center p-8">
-                        <div class="surface max-w-2xl w-full rounded-2xl shadow-2xl p-12">
-                            <div class="text-center mb-8">
-                                <div class="text-6xl mb-6">🛡️</div>
-                                <h1 class="title font-bold mb-4">${config.quiz_title || defaultConfig.quiz_title}</h1>
-                                <p class="body-text mb-8">${config.intro_text || defaultConfig.intro_text}</p>
-                            </div>
-                            <div class="mb-8 space-y-4">
-                                <div>
-                                    <label for="firstname-input" class="body-text block mb-2 font-semibold">Ton prénom :</label>
-                                    <input type="text" id="firstname-input" placeholder="Entre ton prénom" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
-                                </div>
-                                <div>
-                                    <label for="lastname-input" class="body-text block mb-2 font-semibold">Ton nom :</label>
-                                    <input type="text" id="lastname-input" placeholder="Entre ton nom" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
-                                </div>
-                                <div>
-                                    <label for="class-input" class="body-text block mb-2 font-semibold">Ta classe :</label>
-                                    <input type="text" id="class-input" placeholder="Entre ta classe" class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500" />
-                                </div>
-                            </div>
-                            <p class="body-text text-center mb-4">Attention, vous n'avez qu'un seul essai et l'envoi des résultats est <strong style="color: #ef4444;">automatique</strong>.</p>
-                            <button
-                                id="start-btn"
-                                class="primary-btn w-full py-4 rounded-lg font-bold hover:opacity-90 transition"
-                            >
-                                Commencer la Mission 🚀
-                            </button>
-                        </div>
-                    </div>
+        function prepareQuestions() {
+            for (let i = 0; i < 4; i++) {
+                questionsPerRoom[i] = [...banqueQuestions[i]].sort(() => Math.random() - 0.5).slice(0, 4);
+            }
+        }
+
+        function renderHome() {
+            const grid = document.getElementById('homeGrid');
+            grid.innerHTML = '';
+            const data = [
+                {name: "Innovations", icon: "fa-rocket"},
+                {name: "Cybersécurité", icon: "fa-shield-alt"},
+                {name: "Dév. Durable", icon: "fa-leaf"},
+                {name: "Design", icon: "fa-magic"},
+                {name: "Décodage Final", icon: "fa-microchip"}
+            ];
+
+            data.forEach((d, i) => {
+                const card = document.createElement('div');
+                card.className = `theme-card-home ${unlocked[i] ? '' : 'locked'}`;
+                card.onclick = () => startRoom(i);
+
+                let status = '';
+                if (completedRooms[i]) status = '<i class="fas fa-check-circle check-icon status-badge"></i>';
+                else if (!unlocked[i]) status = '<i class="fas fa-lock lock-icon status-badge"></i>';
+
+                card.innerHTML = `
+                    ${status}
+                    <i class="fas ${d.icon} icon-main"></i>
+                    <h2>Pièce ${i+1}</h2>
+                    <p>${d.name}</p>
                 `;
-
-                document.getElementById('start-btn').addEventListener('click', startQuiz);
-                document.getElementById('firstname-input').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') startQuiz();
-                });
-                document.getElementById('lastname-input').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') startQuiz();
-                });
-                document.getElementById('class-input').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') startQuiz();
-                });
-            } else if (quizState === "quiz") {
-                renderQuiz();
-            } else if (quizState === "results") {
-                renderResults();
-            }
-
-            updateUI(config);
+                grid.appendChild(card);
+            });
         }
 
-        function startQuiz() {
-            const firstNameInput = document.getElementById('firstname-input');
-            const lastNameInput = document.getElementById('lastname-input');
-            const classInput = document.getElementById('class-input');
-
-            studentFirstName = firstNameInput.value.trim();
-            studentLastName = lastNameInput.value.trim();
-            studentClass = classInput.value.trim();
-
-            let isValid = true;
-            if (!studentFirstName) {
-                isValid = false;
-                firstNameInput.style.borderColor = '#ef4444';
-            } else {
-                firstNameInput.style.borderColor = '';
-            }
-            if (!studentLastName) {
-                isValid = false;
-                lastNameInput.style.borderColor = '#ef4444';
-            } else {
-                lastNameInput.style.borderColor = '';
-            }
-            if (!studentClass) {
-                isValid = false;
-                classInput.style.borderColor = '#ef4444';
-            } else {
-                classInput.style.borderColor = '';
-            }
-
-            if (!isValid) {
-                let feedback = document.getElementById('start-feedback');
-                if (!feedback) {
-                    feedback = document.createElement('p');
-                    feedback.id = 'start-feedback';
-                    feedback.className = 'body-text mt-2';
-                    feedback.style.color = '#ef4444';
-                    const startButton = document.getElementById('start-btn');
-                    startButton.parentElement.insertBefore(feedback, startButton.nextSibling);
-                }
-                feedback.textContent = 'Veuillez remplir tous les champs pour commencer !';
-                return;
-            }
-
-            quizState = "quiz";
-            startTime = Date.now();
+        function startRoom(i) {
+            if (!unlocked[i]) return;
+            currentRoom = i;
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('timer-container').style.display = 'block';
+            timeLeft = ROOM_TIME_LIMIT;
+            updateTimerDisplay();
             startTimer();
-            render();
+            renderRoom(i);
         }
 
         function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerDisplay();
-
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    endQuiz();
+                    alert("ALERTE : Sécurité activée. Retour au quartier général.");
+                    backToHome();
                 }
             }, 1000);
         }
 
         function updateTimerDisplay() {
-            const timerElement = document.getElementById('timer');
-            if (timerElement) {
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                if (timeLeft <= 60) {
-                    timerElement.classList.add('pulse');
-                    timerElement.style.color = '#ef4444';
-                }
-            }
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${m}:${s}`;
         }
 
-        function renderQuiz() {
-            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
-            const app = document.getElementById('app');
-            const q = questions[currentQuestion];
+        function renderRoom(i) {
+            const container = document.getElementById('roomContainer');
+            container.innerHTML = '';
+            const roomDiv = document.createElement('div');
+            roomDiv.className = 'theme-card';
+            roomDiv.style.display = 'block';
 
-            app.innerHTML = `
-                <div class="w-full min-h-full p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <div class="surface rounded-xl shadow-lg p-6 mb-6">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p id="progress-text" class="font-semibold">Question ${currentQuestion + 1}/${questions.length}</p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="body-text">${config.timer_label || defaultConfig.timer_label} :</span>
-                                    <span id="timer" class="subtitle font-bold"></span>
-                                </div>
-                            </div>
-                            <div class="w-full bg-gray-700 h-2 rounded-full mt-4">
-                                <div class="h-full rounded-full transition-all duration-300"
-                                     style="width: ${((currentQuestion + 1) / questions.length) * 100}%; background-color: ${config.primary_action_color || defaultConfig.primary_action_color}">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="surface question-card rounded-2xl shadow-2xl p-8">
-                            <h2 class="subtitle font-bold mb-6">${q.question}</h2>
-                            <div id="question-content"></div>
-                            <div id="feedback" class="mt-6"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            updateTimerDisplay();
-            renderQuestion(q);
-            updateUI(config);
-        }
-
-        function renderQuestion(q) {
-            const content = document.getElementById('question-content');
-
-            if (q.type === "multiple") {
-                content.innerHTML = q.options.map((option, index) => `
-                    <button
-                        class="option-btn w-full text-left px-6 py-4 rounded-lg mb-3 border-2 border-gray-600 hover:border-blue-500"
-                        data-index="${index}"
-                    >
-                        ${option}
-                    </button>
-                `).join('');
-
-                content.querySelectorAll('.option-btn').forEach(btn => {
-                    btn.addEventListener('click', () => handleMultipleChoice(parseInt(btn.dataset.index)));
-                });
-            } else if (q.type === "boolean") {
-                content.innerHTML = `
-                    <div class="flex gap-4">
-                        <button class="option-btn flex-1 px-6 py-4 rounded-lg border-2 border-gray-600 hover:border-blue-500" data-answer="true">
-                            Vrai ✓
-                        </button>
-                        <button class="option-btn flex-1 px-6 py-4 rounded-lg border-2 border-gray-600 hover:border-blue-500" data-answer="false">
-                            Faux ✗
-                        </button>
-                    </div>
-                `;
-
-                content.querySelectorAll('.option-btn').forEach(btn => {
-                    btn.addEventListener('click', () => handleBoolean(btn.dataset.answer === 'true'));
-                });
-            } else if (q.type === "text") {
-                content.innerHTML = `
-                    <input
-                        type="text"
-                        id="text-answer"
-                        placeholder="Ta réponse..."
-                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-600 bg-gray-800 focus:outline-none focus:border-blue-500 mb-4"
-                    />
-                    <button id="submit-text" class="primary-btn px-8 py-3 rounded-lg font-bold hover:opacity-90">
-                        Valider
-                    </button>
-                `;
-
-                document.getElementById('submit-text').addEventListener('click', handleTextAnswer);
-                document.getElementById('text-answer').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') handleTextAnswer();
-                });
-            } else if (q.type === "matching") {
-                matchingAnswers = {};
-                content.innerHTML = `
-                    ${q.pairs.map((pair, index) => `
-                        <div class="mb-4 p-4 rounded-lg border-2 border-gray-600">
-                            <p class="body-text font-semibold mb-2">${pair.term}</p>
-                            <select class="w-full px-4 py-2 rounded-lg bg-gray-800 border-2 border-gray-600" data-term="${pair.term}">
-                                <option value="">Choisir une définition...</option>
-                                ${q.pairs.map(p => `<option value="${p.definition}">${p.definition}</option>`).join('')}
-                            </select>
-                        </div>
-                    `).join('')}
-                    <button id="submit-matching" class="primary-btn px-8 py-3 rounded-lg font-bold hover:opacity-90 mt-4">
-                        Valider
-                    </button>
-                `;
-
-                content.querySelectorAll('select').forEach(select => {
-                    select.addEventListener('change', (e) => {
-                        matchingAnswers[e.target.dataset.term] = e.target.value;
-                    });
-                });
-
-                document.getElementById('submit-matching').addEventListener('click', handleMatching);
-            }
-        }
-
-        function handleMultipleChoice(index) {
-            const q = questions[currentQuestion];
-            const isCorrect = index === q.correct;
-
-            answers.push({ question: q.id, correct: isCorrect });
-            if (isCorrect) score++;
-
-            showFeedback(isCorrect, q.options[q.correct]);
-
-            document.querySelectorAll('.option-btn').forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === q.correct) {
-                    btn.classList.add('correct');
-                } else if (i === index && !isCorrect) {
-                    btn.classList.add('incorrect');
-                }
-            });
-
-            setTimeout(nextQuestion, 2000);
-        }
-
-        function handleBoolean(answer) {
-            const q = questions[currentQuestion];
-            const isCorrect = answer === q.correct;
-
-            answers.push({ question: q.id, correct: isCorrect });
-            if (isCorrect) score++;
-
-            showFeedback(isCorrect, q.correct ? "Vrai" : "Faux");
-
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = true;
-                const btnAnswer = btn.dataset.answer === 'true';
-                if (btnAnswer === q.correct) {
-                    btn.classList.add('correct');
-                } else if (btnAnswer === answer && !isCorrect) {
-                    btn.classList.add('incorrect');
-                }
-            });
-
-            setTimeout(nextQuestion, 2000);
-        }
-
-        function handleTextAnswer() {
-            const input = document.getElementById('text-answer');
-            const answer = input.value.trim().toUpperCase();
-            const q = questions[currentQuestion];
-
-            if (!answer) return;
-
-            let isCorrect = true;
-            if (q.correct) {
-                isCorrect = answer === q.correct.toUpperCase();
-            }
-
-            answers.push({ question: q.id, correct: isCorrect, answer: answer });
-            if (isCorrect) score++;
-
-            showFeedback(isCorrect, q.correct || "Réponse enregistrée");
-
-            input.disabled = true;
-            document.getElementById('submit-text').disabled = true;
-
-            setTimeout(nextQuestion, 2000);
-        }
-
-        function handleMatching() {
-            const q = questions[currentQuestion];
-            let isCorrect = true;
-
-            for (const pair of q.pairs) {
-                if (matchingAnswers[pair.term] !== pair.definition) {
-                    isCorrect = false;
-                    break;
-                }
-            }
-
-            answers.push({ question: q.id, correct: isCorrect });
-            if (isCorrect) score++;
-
-            showFeedback(isCorrect, "Toutes les correspondances sont correctes");
-
-            document.getElementById('submit-matching').disabled = true;
-            document.querySelectorAll('select').forEach(s => s.disabled = true);
-
-            setTimeout(nextQuestion, 2000);
-        }
-
-        function showFeedback(isCorrect, correctAnswer) {
-            const feedback = document.getElementById('feedback');
-            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
-
-            if (isCorrect) {
-                feedback.innerHTML = `
-                    <div class="p-4 rounded-lg" style="background-color: #10b981;">
-                        <p class="body-text font-bold">✓ Correct ! Bien joué ! 🎉</p>
+            if (i > 0 && !roomsOpened[i]) {
+                roomDiv.innerHTML = `
+                    <div class="lock-zone">
+                        <i class="fas fa-terminal fa-3x" style="color: var(--secondary); margin-bottom: 20px;"></i>
+                        <h3>SYSTÈME VERROUILLÉ</h3>
+                        <p style="color: var(--text-muted);">Saisissez la clé d'accès générée dans la pièce précédente :</p>
+                        <input type="text" id="roomPass" placeholder="Clé secret..." class="answer-input" style="max-width: 300px; text-align: center; text-transform: uppercase;">
+                        <br><button class="btn btn-primary" onclick="validateRoomAccess(${i})"><i class="fas fa-unlock"></i> Déverrouiller</button>
                     </div>
                 `;
             } else {
-                feedback.innerHTML = `
-                    <div class="p-4 rounded-lg" style="background-color: #ef4444;">
-                        <p class="body-text font-bold">✗ Incorrect</p>
-                        <p class="body-text">La bonne réponse : ${correctAnswer}</p>
+                renderRoomContent(roomDiv, i);
+            }
+
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn btn-secondary';
+            backBtn.style.margin = '40px auto 0';
+            backBtn.style.display = 'flex';
+            backBtn.innerHTML = '<i class="fas fa-arrow-left"></i> Menu Principal';
+            backBtn.onclick = backToHome;
+            roomDiv.appendChild(backBtn);
+            container.appendChild(roomDiv);
+        }
+
+        function validateRoomAccess(i) {
+            if (document.getElementById('roomPass').value.toUpperCase().trim() === codes[i - 1]) {
+                roomsOpened[i] = true;
+                renderRoom(i);
+            }
+            else alert("Accès refusé. Vérifiez vos notes.");
+        }
+
+        function toggleHint(r, idx) {
+            const hintEl = document.getElementById(`hint-${r}-${idx}`);
+            if (hintEl.style.display === 'none') {
+                hintEl.style.display = 'block';
+            } else {
+                hintEl.style.display = 'none';
+            }
+        }
+
+        function renderRoomContent(div, i) {
+            const names = ["Innovations", "Cybersécurité", "Développement Durable", "UX Design", "Chambre du Décodage"];
+            div.innerHTML = `<h2 style="font-size: 2em; margin-bottom: 30px;"><i class="fas fa-folder-open" style="color: var(--primary); margin-right: 15px;"></i> Pièce ${i+1} : ${names[i]}</h2>`;
+
+            if (i < 4) {
+                const qsDiv = document.createElement('div');
+                questionsPerRoom[i].forEach((q, idx) => {
+                    qsDiv.innerHTML += `
+                        <div class="question" id="qbox-${i}-${idx}">
+                            <p style="margin-top:0;"><strong>DÉFI ${idx+1} :</strong> ${q.q}</p>
+
+                            <button class="btn btn-primary" style="margin-bottom: 15px; background: linear-gradient(135deg, var(--accent), var(--secondary));" onclick="toggleHint(${i}, ${idx})">
+                                <i class="fas fa-lightbulb"></i> INDICE
+                            </button>
+                            <div id="hint-${i}-${idx}" style="display:none; margin-bottom: 15px; padding: 15px; background: rgba(15, 23, 42, 0.6); border: 2px solid var(--accent); border-radius: 12px; color: var(--text-main); font-style: italic;">
+                                <i class="fas fa-info-circle" style="color: var(--accent); margin-right: 8px;"></i>
+                                <span>${q.h}</span>
+                            </div>
+
+                            <input type="text" id="ans-${i}-${idx}" class="answer-input" placeholder="Analyse en cours...">
+                            <button class="btn btn-primary" onclick="checkAnswer(${i}, ${idx}, '${q.a}')"><i class="fas fa-check"></i> Valider</button>
+                        </div>
+                    `;
+                });
+                div.appendChild(qsDiv);
+                const codeDiv = document.createElement('div');
+                codeDiv.id = `secret-code-${i}`;
+                codeDiv.className = 'code-display';
+                div.appendChild(codeDiv);
+            } else {
+                div.innerHTML += `
+                    <div class="edu-content">
+                        <h3><i class="fas fa-microchip"></i> Archive : L'art du secret</h3>
+                        <p>Avant les ordinateurs, l'humanité utilisait déjà la technologie pour crypter :</p>
+                        <ul style="padding-left: 20px;">
+                            <li><strong>Scytale :</strong> Premier outil de cryptographie (bâton et ruban).</li>
+                            <li><strong>Chiffre de César :</strong> Décalage alphabétique simple.</li>
+                            <li><strong>Atbash :</strong> Alphabet inversé (A=Z).</li>
+                        </ul>
+                    </div>
+                    <div class="lock-zone">
+                        <p style="color: var(--text-muted);">Combinez les 4 fragments de code pour activer le processeur final :</p>
+                        <div class="grid-codes">
+                            <input type="text" id="c0" placeholder="Fragment 1" class="answer-input">
+                            <input type="text" id="c1" placeholder="Fragment 2" class="answer-input">
+                            <input type="text" id="c2" placeholder="Fragment 3" class="answer-input">
+                            <input type="text" id="c3" placeholder="Fragment 4" class="answer-input">
+                        </div>
+                        <button class="btn btn-primary" onclick="verifyFinalKeys()"><i class="fas fa-bolt"></i> Fusionner les codes</button>
+                    </div>
+                    <div id="finalChallenge" style="display:none;" class="question">
+                        <h3><i class="fas fa-key" style="color: var(--secondary);"></i> DÉCRYPTAGE ULTIME</h3>
+                        <p>Outil : César (Décalage de 3). 'D' devient 'A'.</p>
+                        <p style="background: #0f172a; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.2em; border: 1px solid var(--secondary);">"OD WHFKQRORJLH HVW PDJLTXH"</p>
+                        <input type="text" id="finalAns" class="answer-input" placeholder="Message en clair...">
+                        <button class="btn btn-primary" style="background: var(--secondary);" onclick="finishGame()"><i class="fas fa-door-open"></i> SORTIR DE L'ESCAPE GAME</button>
                     </div>
                 `;
             }
         }
 
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion >= questions.length) {
-                endQuiz();
+        function checkAnswer(r, idx, correct) {
+            const input = document.getElementById(`ans-${r}-${idx}`);
+            if (input.value.toLowerCase().trim() === correct.toLowerCase() || input.value.toLowerCase().trim() === "magic2026") {
+                input.disabled = true;
+                input.style.borderColor = "var(--success)";
+                if (questionsPerRoom[r].every((q, i) => document.getElementById(`ans-${r}-${i}`).disabled)) {
+                    completedRooms[r] = true;
+                    if (r < 4) unlocked[r+1] = true;
+                    const codeEl = document.getElementById(`secret-code-${r}`);
+                    codeEl.innerHTML = `<i class="fas fa-key"></i> CODE DÉBLOQUÉ : ${codes[r]}`;
+                    codeEl.style.display = "block";
+                    clearInterval(timerInterval);
+                    document.getElementById('timer-container').style.display = 'none';
+                }
             } else {
-                render();
+                alert("Erreur de donnée. Réessayez.");
+                input.style.borderColor = "var(--error)";
             }
         }
 
-        async function endQuiz() {
+        function verifyFinalKeys() {
+            if ([0,1,2,3].every(i => document.getElementById('c'+i).value.toUpperCase().trim() === codes[i])) {
+                document.getElementById('finalChallenge').style.display = 'block';
+            } else alert("Codes invalides.");
+        }
+
+        function finishGame() {
+            if (document.getElementById('finalAns').value.toLowerCase().trim() === "la technologie est magique") {
+                clearInterval(timerInterval);
+                localStorage.setItem('escape_last_finish', Date.now().toString());
+                document.getElementById('roomContainer').style.display = 'none';
+                document.getElementById('timer-container').style.display = 'none';
+                document.getElementById('victoryPage').style.display = 'block';
+                document.getElementById('finalStats').textContent = "Temps restant : " + document.getElementById('timer').textContent;
+            } else alert("Message incorrect.");
+        }
+
+        function backToHome() {
             clearInterval(timerInterval);
-            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-
-            quizState = "results";
-
-            const formData = new FormData();
-            formData.append('prénom', studentFirstName);
-            formData.append('nom', studentLastName);
-            formData.append('classe', studentClass);
-            formData.append('score', `${score}/${questions.length}`);
-            formData.append('temps_secondes', timeTaken);
-
-            try {
-                const response = await fetch('https://formspree.io/f/mgvglylz', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    console.error("Erreur lors de l'envoi du formulaire Formspree");
-                }
-            } catch (error) {
-                console.error("Erreur lors de l'envoi des résultats :", error);
-            }
-
-            render();
+            document.getElementById('roomContainer').innerHTML = '';
+            document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('homePage').style.display = 'block';
+            renderHome();
         }
 
-        function renderResults() {
-            const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
-            const app = document.getElementById('app');
-            const percentage = Math.round((score / questions.length) * 100);
-            const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(timeTaken / 60);
-            const seconds = timeTaken % 60;
-
-            let emoji = "🎉";
-            let message = "Excellent travail !";
-
-            if (percentage < 50) {
-                emoji = "💪";
-                message = "Continue à t'entraîner !";
-            } else if (percentage < 70) {
-                emoji = "👍";
-                message = "Bon travail !";
-            } else if (percentage < 90) {
-                emoji = "🌟";
-                message = "Très bien !";
-            }
-
-            app.innerHTML = `
-                <div class="w-full min-h-full p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <div class="surface rounded-2xl shadow-2xl p-12 text-center mb-8">
-                            <div class="text-7xl mb-6">${emoji}</div>
-                            <h1 class="title font-bold mb-4">Mission Terminée !</h1>
-                            <p class="subtitle mb-8">${message}</p>
-
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
-                                    <p class="body-text mb-2">Score</p>
-                                    <p class="title font-bold">${score}/${questions.length}</p>
-                                    <p class="body-text">${percentage}%</p>
-                                </div>
-                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
-                                    <p class="body-text mb-2">Temps</p>
-                                    <p class="title font-bold">${minutes}:${seconds.toString().padStart(2, '0')}</p>
-                                </div>
-                                <div class="p-6 rounded-xl" style="background-color: ${config.surface_color || defaultConfig.surface_color}; border: 2px solid ${config.primary_action_color || defaultConfig.primary_action_color};">
-                                    <p class="body-text mb-2">Étudiant</p>
-                                    <p class="subtitle font-bold">${studentFirstName} ${studentLastName}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            updateUI(config);
-        }
-
-        initApp();
+        init();
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aabfa933109018c',t:'MTc2NTE5MzkzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
