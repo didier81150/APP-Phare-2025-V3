@@ -160,15 +160,15 @@
                     <div class="bg-blue-50 border border-blue-100 text-blue-900 p-5 rounded-2xl flex gap-3 items-start">
                         <span class="text-xl">🔐</span>
                         <div class="text-sm leading-relaxed">
-                            <strong class="font-bold">Identifie-toi :</strong> Sélectionne ton prénom, ton nom et ta classe dans les listes ci-dessous, puis saisis ton code secret à 10 caractères (ex: <code>BODI001XCG</code>) présent sur ta fiche élève.
+                            <strong class="font-bold">Identifie-toi :</strong> Sélectionne d'abord ta <strong class="text-blue-700">classe</strong>, puis ton nom et ton prénom. Enfin, saisis ton code secret présent sur ta fiche élève.
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                         <div class="space-y-2">
-                            <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Prénom</label>
-                            <div class="relative" id="prenom-container">
-                                <select id="select-prenom" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none appearance-none cursor-pointer transition-all">
+                            <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Classe</label>
+                            <div class="relative" id="classe-container">
+                                <select id="select-classe" onchange="filtrerElevesParClasse()" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none appearance-none cursor-pointer transition-all">
                                     <option value="">Chargement de la liste...</option>
                                 </select>
                             </div>
@@ -177,21 +177,26 @@
                             <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Nom</label>
                             <div class="relative" id="nom-container">
                                 <select id="select-nom" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none appearance-none cursor-pointer transition-all">
-                                    <option value="">Chargement de la liste...</option>
+                                    <option value="">(Sélectionner une classe)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Classe</label>
-                            <div class="relative" id="classe-container">
-                                <select id="select-classe" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none appearance-none cursor-pointer transition-all">
-                                    <option value="">Chargement de la liste...</option>
+                            <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Prénom</label>
+                            <div class="relative" id="prenom-container">
+                                <select id="select-prenom" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none appearance-none cursor-pointer transition-all">
+                                    <option value="">(Sélectionner une classe)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-xs font-bold uppercase tracking-wide text-slate-500">Code secret personnel</label>
-                            <input type="password" id="input-code" placeholder="Saisis ton code secret élève" autocomplete="off" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none transition-all placeholder:text-slate-400">
+                            <div class="relative">
+                                <input type="password" id="input-code" placeholder="Saisis ton code secret élève" autocomplete="off" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-3 pr-12 text-slate-700 font-semibold focus:border-blue-500 focus:outline-none transition-all placeholder:text-slate-400">
+                                <button type="button" onclick="toggleCodeVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors p-1" title="Afficher/Masquer le code">
+                                    <span id="toggle-icon">👁️</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -415,6 +420,19 @@ function doGet(e) {
         document.getElementById("teacher-script-url").value = localStorage.getItem("script_url");
     }
 
+    // ==================== VISIBILITÉ DU CODE ====================
+    function toggleCodeVisibility() {
+        const input = document.getElementById("input-code");
+        const icon = document.getElementById("toggle-icon");
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "🔒";
+        } else {
+            input.type = "password";
+            icon.textContent = "👁️";
+        }
+    }
+
     // ==================== CHARGEMENT DE L'ANNUAIRE ====================
     async function chargerEleves() {
         try {
@@ -452,9 +470,10 @@ function doGet(e) {
                 ELEVES.push({ nom: "BOIVIN", prenom: "Didier", classe: "307", code_secret: "BODI001XCG" });
                 ELEVES.push({ nom: "LAVIT", prenom: "Véronique", classe: "301", code_secret: "LAVE002XDJ" });
             }
-            remplirSelect("select-prenom", [...new Set(ELEVES.map(e => e.prenom))].sort());
-            remplirSelect("select-nom",    [...new Set(ELEVES.map(e => e.nom))].sort());
             remplirSelect("select-classe", [...new Set(ELEVES.map(e => e.classe))].sort());
+            // On ne remplit pas les prénoms/noms tant que la classe n'est pas choisie
+            remplirSelect("select-prenom", [], "(Sélectionner une classe)");
+            remplirSelect("select-nom",    [], "(Sélectionner une classe)");
             document.getElementById("login-error").classList.add("hidden");
         } catch(e) {
             console.error("Erreur annuaire :", e);
@@ -462,14 +481,33 @@ function doGet(e) {
         }
     }
 
-    function remplirSelect(id, valeurs) {
+    function remplirSelect(id, valeurs, labelVide = "— Sélectionner —") {
         const sel = document.getElementById(id);
-        sel.innerHTML = `<option value="">— Sélectionner —</option>`;
+        if (!sel) return;
+        const currentVal = sel.value;
+        sel.innerHTML = `<option value="">${labelVide}</option>`;
         valeurs.forEach(v => {
             const opt = document.createElement("option");
             opt.value = v; opt.textContent = v;
+            if (v === currentVal) opt.selected = true;
             sel.appendChild(opt);
         });
+    }
+
+    function filtrerElevesParClasse() {
+        const classeChoisie = document.getElementById("select-classe").value;
+        if (!classeChoisie) {
+            remplirSelect("select-prenom", [], "(Sélectionner une classe)");
+            remplirSelect("select-nom", [], "(Sélectionner une classe)");
+            return;
+        }
+
+        const elevesFiltres = ELEVES.filter(e => e.classe === classeChoisie);
+        const prenoms = [...new Set(elevesFiltres.map(e => e.prenom))].sort();
+        const noms = [...new Set(elevesFiltres.map(e => e.nom))].sort();
+
+        remplirSelect("select-prenom", prenoms);
+        remplirSelect("select-nom", noms);
     }
 
     function activerSaisieManuelle() {
